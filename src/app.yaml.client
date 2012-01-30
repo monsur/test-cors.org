@@ -1,0 +1,10 @@
+application: $APPLICATION
+version: client
+runtime: python
+api_version: 1
+
+handlers:
+- url: /client
+  static_files: static/corsclient.html
+  upload: static/corsclient.html
+

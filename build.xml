@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project name="cors-api" basedir=".">
+  <property name="application" value="cors-api"/>
+
+  <target name="clean">
+    <delete dir="${destdir}"/>
+  </target>
+
+  <target name="client.local">
+    <property name="server" value="http://localhost:8082"/>
+    <property name="destdir" location="web.client.local"/>
+  </target>
+
+  <target name="client.live">
+    <property name="server" value="http://server.cors-api.appspot.com"/>
+    <property name="destdir" location="web.client.live"/>
+  </target>
+
+  <target name="server">
+    <property name="destdir" location="web.server"/>
+  </target>
+
+  <target name="build.client">
+    <copy file="${basedir}/src/static/corsclient.html"
+          todir="${destdir}/static"/>
+    <copy file="${basedir}/src/app.yaml.client"
+          tofile="${destdir}/app.yaml"/>
+    <replace dir="${destdir}"
+             token="$APPLICATION"
+             value="${application}"/>
+    <replace dir="${destdir}"
+             token="$SERVER"
+             value="${server}"/>
+  </target>
+
+  <target name="build.client.local" depends="client.local,build.client">
+  </target>
+
+  <target name="build.client.live" depends="client.live,build.client">
+  </target>
+
+  <target name="build.server" depends="server">
+    <copy file="${basedir}/src/corsserver.py"
+          tofile="${destdir}/corsserver.py"/>
+    <copy file="${basedir}/src/app.yaml.server"
+          tofile="${destdir}/app.yaml"/>
+    <replace dir="${destdir}"
+             token="$APPLICATION"
+             value="${application}"/>
+  </target>
+
+  <target name="deploy.client" depends="build.client.live">
+    <exec executable="${basedir}/bin/deploy.client.sh"/>
+  </target>
+
+  <target name="deploy.server" depends="build.server">
+    <exec executable="${basedir}/bin/deploy.server.sh"/>
+  </target>
+
+  <target name="deploy" depends="deploy.client,deploy.server">
+  </target>
+
+</project>
+
+

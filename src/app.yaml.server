@@ -1,0 +1,9 @@
+application: $APPLICATION
+version: server
+runtime: python
+api_version: 1
+
+handlers:
+- url: /server
+  script: corsserver.py
+
