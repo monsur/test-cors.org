@@ -6,32 +6,49 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 # TODO: Head responses shouldn't have a body.
 
-separator = '========================================'
 
-def getItem(title, key, val):
-  return title + ' = ' + key + ': ' + val + '\r\n'
+class TextSerializer:
 
-def serializeRequest(request):
-  reqstr = 'REQUEST\r\n======\r\n\r\n'
-  reqstr += 'url = ' + request.url + '\r\n'
-  for header, val in request.headers.iteritems():
-    reqstr += getItem('header', header, val)
-  for cookie, val in request.cookies.iteritems():
-    reqstr += getItem('cookie', cookie, val)
-  return reqstr
+  separator = '========================================'
 
-def serializeResponse(response):
-  resstr = 'RESPONSE\r\n========\r\n\r\n'
-  for header, val in response.headers.iteritems():
-    resstr += getItem('header', header, val)
-  return resstr
+  def getBodyWithPreflight(self, preflight, cors):
+    separator = '========================================'
+    return separator + '\r\nPREFLIGHT REQUEST\r\n\r\n' + preflight + '\r\n' + separator + '\r\nCORS REQUEST\r\n\r\n' + cors
 
-def getBody(request, response):
-  body = 'The following requests/responses were logged by the server:\r\n\r\n'
-  body += serializeRequest(request)
-  body += '\r\n\r\n'
-  body += serializeResponse(response) + '\r\n'
-  return body
+  def __init__(self, request, response):
+    self.request = request
+    self.response = response
+
+  def getItem(self, title, key, val):
+    return title + ' = ' + key + ': ' + val + '\r\n'
+
+  def serializeDict(self, title, d):
+    buff = ''
+    for key in d.keys():
+      val = d.get(key)
+      if val:  # This is to guard against a KeyError
+        buff += self.getItem(title, key, val)
+    return buff
+
+  def serializeRequest(self):
+    reqstr = 'REQUEST\r\n======\r\n\r\n'
+    reqstr += 'url = ' + self.request.url + '\r\n'
+    reqstr += self.serializeDict('header', self.request.headers)
+    reqstr += self.serializeDict('cookie', self.request.cookies)
+    return reqstr
+
+  def serializeResponse(self):
+    resstr = 'RESPONSE\r\n========\r\n\r\n'
+    resstr = self.serializeDict('header', self.response.headers)
+    return resstr
+
+  def getBody(self):
+    body = 'The following requests/responses were logged by the server:\r\n\r\n'
+    body += self.serializeRequest()
+    body += '\r\n\r\n'
+    body += self.serializeResponse() + '\r\n'
+    return body  
+
 
 class CorsServer(webapp.RequestHandler):
 
@@ -72,18 +89,20 @@ class CorsServer(webapp.RequestHandler):
     self.__storeBody(config)
 
   def __storeBody(self, config):
-    body = getBody(self.request, self.response)
+    serializer = TextSerializer(self.request, self.response)
+    body = serializer.getBody()
     id = config['id']
     if id is not None:
       memcache.set(id, body)
 
   def __retrieveBody(self, config):
-    body = getBody(self.request, self.response)
+    serializer = TextSerializer(self.request, self.response)
+    body = serializer.getBody()
     id = config['id']
     if id is not None:
       prevbody = memcache.get(id)
       if prevbody is not None:
-        body = separator + '\r\nPREFLIGHT REQUEST\r\n\r\n' + prevbody + '\r\n' + separator + '\r\nCORS REQUEST\r\n\r\n' + body
+        body = serializer.getBodyWithPreflight(prevbody, body)
         memcache.delete(id)
     return body
 
