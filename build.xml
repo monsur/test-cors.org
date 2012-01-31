@@ -60,6 +60,14 @@
   <target name="deploy" depends="deploy.client,deploy.server">
   </target>
 
+  <target name="run.server" depends="build.server">
+    <exec executable="${basedir}/bin/run.server.sh"/>
+  </target>
+
+  <target name="run.client" depends="build.client.local">
+    <exec executable="${basedir}/bin/run.client.sh"/>
+  </target>
+
 </project>
 
 
