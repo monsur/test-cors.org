@@ -157,24 +157,25 @@ class CorsServer(webapp.RequestHandler):
 
     return config
 
-  def __sendResponse(self, config):
+
+  def __handleRequest(self, httpMethod):
+    config = self.__getConfig(httpMethod)
+
     self.response.headers['Content-Type'] = 'application/json'
     if 'httpstatus' in config:
       self.response.set_status(config['httpstatus'])
+
+    if self.__isCors() and config['enable'] == True:
+      if self.__isPreflight(httpMethod):
+        self.__handlePreflight(config)
+      else:
+        self.__handleCors(config)
+
     body = ''
     if 'body' in config:
       body = json.dumps(config['body'])
     self.response.headers['Content-Length'] = len(body)
     self.response.out.write(body)
-
-  def __handleRequest(self, httpMethod):
-   config = self.__getConfig(httpMethod)
-   if self.__isCors() and config['enable'] == True:
-     if self.__isPreflight(httpMethod):
-       self.__handlePreflight(config)
-     else:
-       self.__handleCors(config)
-   self.__sendResponse(config)
 
   def delete(self):
     self.__handleRequest('DELETE')
