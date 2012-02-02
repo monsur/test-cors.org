@@ -1,10 +1,43 @@
 import logging
+import random
+import string
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-# TODO: Head responses shouldn't have a body.
+from django.utils import simplejson as json
+
+
+class JsonSerializer:
+
+  def getDict(self, d):
+    returnd = {}
+    for key in d.keys():
+      val = d.get(key)
+      if val: # This is to guard against a KeyError
+        returnd[key] = val
+    return returnd
+
+  def getRequestJson(self, request, config):
+    reqJson = {}
+    reqJson['url'] = request.url
+    reqJson['httpMethod'] = config['httpMethod']
+    reqJson['headers'] = self.getDict(request.headers)
+    reqJson['cookies'] = self.getDict(request.cookies)
+    return reqJson
+
+  def getResponseJson(self, response):
+    resJson = {}
+    resJson['headers'] = self.getDict(response.headers)
+    return resJson
+
+  def getBody(self, requestType, request, response, config):
+    body = {}
+    body['requestType'] = requestType
+    body['request'] = self.getRequestJson(request, config)
+    body['response'] = self.getResponseJson(response)
+    return body
 
 
 class TextSerializer:
@@ -75,7 +108,7 @@ class CorsServer(webapp.RequestHandler):
       self.response.headers['Access-Control-Expose-Headers'] = exposeHeaders
       self.__exposeResponseHeaders(exposeHeaders.split(','), self.response)
 
-    config['body'] = self.__retrieveBody(config)
+    config['body'] = self.__retrieveBody(config, 'cors')
 
   def __isPreflight(self, httpMethod):
     return self.__isCors() and httpMethod == 'OPTIONS' and 'Access-Control-Request-Method' in self.request.headers
@@ -86,31 +119,33 @@ class CorsServer(webapp.RequestHandler):
       self.response.headers['Access-Control-Allow-Methods'] = config['methods']
     if config['headers'] != '':
       self.response.headers['Access-Control-Allow-Headers'] = config['headers']
-    self.__storeBody(config)
+    self.__storeBody(config, 'preflight')
 
-  def __storeBody(self, config):
-    serializer = TextSerializer(self.request, self.response)
-    body = serializer.getBody()
+  def __storeBody(self, config, reqType):
+    serializer = JsonSerializer()
+    body = serializer.getBody(reqType, self.request, self.response, config)
     id = config['id']
     if id is not None:
       memcache.set(id, body)
 
-  def __retrieveBody(self, config):
-    serializer = TextSerializer(self.request, self.response)
-    body = serializer.getBody()
+  def __retrieveBody(self, config, reqType):
+    body = []
+    serializer = JsonSerializer()
+    body.append(serializer.getBody(reqType, self.request, self.response, config))
     id = config['id']
     if id is not None:
       prevbody = memcache.get(id)
-      if prevbody is not None:
-        body = serializer.getBodyWithPreflight(prevbody, body)
+      if prevbody:
+        body.append(prevbody)
         memcache.delete(id)
     return body
 
-  def __getConfig(self):
+  def __getConfig(self, httpMethod):
     config = {}
     config['enable'] = self.request.get('enable', True)
     if self.request.get('credentials') == 'true':
       config['credentials'] = True
+    config['httpMethod'] = httpMethod
     config['methods'] = self.request.get('methods')
     config['headers'] = self.request.get('headers')
     config['exposeHeaders'] = self.request.get('exposeHeaders')
@@ -123,17 +158,17 @@ class CorsServer(webapp.RequestHandler):
     return config
 
   def __sendResponse(self, config):
-    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.headers['Content-Type'] = 'application/json'
     if 'httpstatus' in config:
       self.response.set_status(config['httpstatus'])
     body = ''
     if 'body' in config:
-      body = config['body']
+      body = json.dumps(config['body'])
     self.response.headers['Content-Length'] = len(body)
     self.response.out.write(body)
 
   def __handleRequest(self, httpMethod):
-   config = self.__getConfig()
+   config = self.__getConfig(httpMethod)
    if self.__isCors() and config['enable'] == True:
      if self.__isPreflight(httpMethod):
        self.__handlePreflight(config)
