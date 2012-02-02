@@ -232,23 +232,24 @@ Oops, looks like your browser doesn't support CORS!
 
   function getRequestUrl(settings) {
     var url = serverUrl + '?';
+    url += 'id=' + Math.floor(Math.random()*10000000);
     if (!settings.enable) {
-      url += 'enable=false&';
+      url += '&enable=false';
     }
     if (settings.credentials) {
-      url += 'credentials=true&';
+      url += '&credentials=true';
     }
     if (settings.httpstatus) {
-      url += 'httpstatus=' + encodeURIComponent(settings.httpstatus) + '&';
+      url += '&httpstatus=' + encodeURIComponent(settings.httpstatus);
     }
     if (settings.methods) {
-      url += 'methods=' + encodeURIComponent(settings.methods) + '&';
+      url += '&methods=' + encodeURIComponent(settings.methods);
     }
     if (settings.headers) {
-      url += 'headers=' + encodeURIComponent(settings.headers) + '&';
+      url += '&headers=' + encodeURIComponent(settings.headers);
     }
     if (settings.exposeHeaders) {
-      url += 'exposeHeaders=' + encodeURIComponent(settings.exposeHeaders) + '&';
+      url += '&exposeHeaders=' + encodeURIComponent(settings.exposeHeaders);
     }
     return url;
   }
