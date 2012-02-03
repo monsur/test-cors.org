@@ -8,3 +8,12 @@ handlers:
   static_files: static/corsclient.html
   upload: static/corsclient.html
 
+- url: /css
+  static_dir: static/css
+
+- url: /img
+  static_dir: static/img
+
+- url: /js
+  static_dir: static/js
+

@@ -1,0 +1,17 @@
+.submit-button-container {
+ float: right;
+ margin-top: 50px;
+}
+
+.log-red {
+  color: #B40404;
+}
+
+.log-yellow {
+  color: #AEB404;
+}
+
+.log-green {
+  color: #088A08;
+}
+
