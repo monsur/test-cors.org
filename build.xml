@@ -21,8 +21,9 @@
   </target>
 
   <target name="build.client">
-    <copy file="${basedir}/src/static/corsclient.html"
-          todir="${destdir}/static"/>
+    <copy todir="${destdir}/static">
+      <fileset dir="${basedir}/src/static"/>
+    </copy>
     <copy file="${basedir}/src/app.yaml.client"
           tofile="${destdir}/app.yaml"/>
     <replace dir="${destdir}"
