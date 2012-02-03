@@ -119,26 +119,13 @@ Oops, looks like your browser doesn't support CORS!
 
 </fieldset>
 
-  <fieldset id="response" class="column">
-    <legend>
-      Response Details
-    </legend>
-
-    <div id="response_details">
-    <div id="response_status">Status: <span id="response_status_content"></span></div>
-    <div id="response_statusText">Status Text: <span id="response_statusText_content"></span></div>
-    <div id="response_headers">Headers: <pre id="response_headers_content"></pre></div>
-    <div id="response_body">Body:<br /> <textarea id="response_body_content"></textarea></div>
-    </div>
-  </fieldset>
-
-<fieldset id="xhrevents" class="column">
+<fieldset id="log" class="column">
   <legend>
-    XHR Events
+    Log
   </legend>
 
-
-    <div id="response_events"><div id="response_events_content"></div></div>
+  <pre id="outputLog">
+  </pre>
 </fieldset>
 
 </div>
@@ -158,6 +145,22 @@ Oops, looks like your browser doesn't support CORS!
   // Reading response headers from Chrome?
 
   var serverUrl = '$SERVER/server';
+
+
+  var Logger = function(opt_destinationId) {
+    this.destinationId = '#' + (opt_destinationId || 'outputLog');
+  };
+
+  Logger.prototype.log = function(msg) {
+    $(this.destinationId).append(msg + '\r\n');
+  };
+
+  Logger.prototype.clear = function() {
+    $(this.destinationId).empty();
+  };
+
+
+  var logger = new Logger();
 
   function loadQueryString(str) {
     if (typeof(str) != 'string' || str.length == 0) {
@@ -286,26 +289,27 @@ Oops, looks like your browser doesn't support CORS!
     return xhr;
   }
 
-  function resetResponseDivs() {
-    $('#response_events_content').empty();
-    $('#response_status_content').empty();
-    $('#response_statusText_content').empty();
-    $('#response_headers_content').empty();
-    $('#response_body_content').empty();
-  }
-
   function logEvent(msg) {
-    $('#response_events_content').append(msg + '<br>');
+    logger.log('Fired XHR event: ' + msg);
   }
 
   function logXhr(xhr) {
-    $('#response_status_content').text(xhr.status);
+    logger.log('XHR status: ' + xhr.status);
     if ('statusText' in xhr) {
       // Firefox doesn't allow access to statusText when there's an error.
-      $('#response_statusText_content').text(xhr.statusText);
+      logger.log('XHR status text: ' + xhr.statusText);
     }
-    $('#response_headers_content').text(xhr.getAllResponseHeaders());
-    $('#response_body_content').text(xhr.responseText);
+    var text = xhr.responseText;
+    if (text) {
+      logResponseDetails(JSON.parse(text))
+    }
+  }
+
+  function logResponseDetails(response) {
+    logCors(response['cors']);
+    if ('preflight' in response) {
+      logPreflight(response['preflight']);
+    }
   }
 
   function handleReadyStateChange(event) {
@@ -343,20 +347,34 @@ Oops, looks like your browser doesn't support CORS!
   }
 
   function sendRequest() {
-    resetResponseDivs();
+    logger.clear();
+
     var settings = getSettings();
     var requestUrl = getRequestUrl(settings.server);
+
+    var msg = 'Sending ' + settings.client.method + ' request to ' +
+        requestUrl;
+
     var xhr = createCORSRequest(settings.client.method, requestUrl);
+
     if (settings.client.credentials) {
       xhr.withCredentials = true;
+      msg += ', with credentials';
     }
+
+    var headersMsg = '';
     var headers = settings.client.headers;
     for (var name in headers) {
       if (!headers.hasOwnProperty(name)) {
         continue;
       }
       xhr.setRequestHeader(name, headers[name]);
+      if (headersMsg.length == 0) {
+        headersMsg = ', with custom headers';
+      }
     }
+    msg += headersMsg;
+
     xhr.onreadystatechange = handleReadyStateChange;
     xhr.onloadstart = handleLoadStart;
     xhr.onprogress = handleProgress;
@@ -365,6 +383,8 @@ Oops, looks like your browser doesn't support CORS!
     xhr.onload = handleLoad;
     xhr.ontimeout = handleTimeout;
     xhr.onloadend = handleLoadEnd;
+
+    logger.log(msg);
     xhr.send();
   }
 
