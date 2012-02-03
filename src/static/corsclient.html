@@ -150,6 +150,7 @@ Oops, looks like your browser doesn't support CORS!
   // TODO: Detect if CORS is supported and display a message if it isn't.
   // TODO: Is there a way to trap on thrown errors?  Or show console.log messages on the page?
   // TODO: Detect if there is a mismatch and we expect an error.
+  // TODO: Add link to link to current request.
 
   // Browser bugs:
   // Setting custom headers on GET requests in WebKit
@@ -414,8 +415,7 @@ Oops, looks like your browser doesn't support CORS!
   }
 
   function isCorsSupported() {
-    var xhr = new XMLHttpRequest();
-    return "withCredentials" in xhr;
+    return createCORSRequest('GET', '/') != null;
   }
 
   $(document).ready(function(){
