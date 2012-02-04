@@ -1,7 +1,6 @@
 
 // TODO: Help descriptions for each item
 // TODO: Detect if there is a mismatch and we expect an error.
-// TODO: Add link to link to current request.
 
 // Browser bugs:
 // Setting custom headers on GET requests in WebKit
@@ -11,6 +10,9 @@
 var serverUrl = '$SERVER/server';
 
 
+/**
+ * @constructor
+ */
 var Logger = function(opt_destinationId) {
   this.destinationId = '#' + (opt_destinationId || 'outputLog');
 };
@@ -294,20 +296,20 @@ function sendRequest() {
 
   var settings = getSettings();
   logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + createLink(settings) + '\');return false;">Link to this test</a>');
-  var requestUrl = getServerRequestUrl(settings.server);
+  var requestUrl = getServerRequestUrl(settings['server']);
 
-  var msg = 'Sending ' + settings.client.method + ' request to ' +
+  var msg = 'Sending ' + settings['client']['method'] + ' request to ' +
       requestUrl + '<br>';
 
-  var xhr = createCORSRequest(settings.client.method, requestUrl);
+  var xhr = createCORSRequest(settings['client']['method'], requestUrl);
 
-  if (settings.client.credentials) {
+  if (settings['client']['credentials']) {
     xhr.withCredentials = true;
     msg += ', with credentials';
   }
 
   var headersMsg = '';
-  var headers = settings.client.headers;
+  var headers = settings['client']['headers'];
   for (var name in headers) {
     if (!headers.hasOwnProperty(name)) {
       continue;
@@ -390,19 +392,19 @@ function addQueryString(key, val, buffer, opt_allowEmpty) {
 
 function createQueryString(settings) {
   var buffer = [];
-  addQueryString('server.enable', settings.server.enable, buffer, true);
-  addQueryString('server.credentials', settings.server.credentials, buffer);
-  addQueryString('server.httpstatus', settings.server.httpstatus, buffer);
-  addQueryString('server.methods', settings.server.methods, buffer);
-  addQueryString('server.headers', settings.server.headers, buffer);
-  addQueryString('server.exposeHeaders', settings.server.exposeHeaders, buffer);
-  addQueryString('client.method', settings.client.method, buffer);
-  addQueryString('client.credentials', settings.client.credentials, buffer);
-  for (var name in settings.client.headers) {
-    if (!settings.client.headers.hasOwnProperty(name)) {
+  addQueryString('server.enable', settings['server']['enable'], buffer, true);
+  addQueryString('server.credentials', settings['server']['credentials'], buffer);
+  addQueryString('server.httpstatus', settings['server']['httpstatus'], buffer);
+  addQueryString('server.methods', settings['server']['methods'], buffer);
+  addQueryString('server.headers', settings['server']['headers'], buffer);
+  addQueryString('server.exposeHeaders', settings['server']['exposeHeaders'], buffer);
+  addQueryString('client.method', settings['client']['method'], buffer);
+  addQueryString('client.credentials', settings['client']['credentials'], buffer);
+  for (var name in settings['client']['headers']) {
+    if (!settings['client']['headers'].hasOwnProperty(name)) {
       continue;
     }
-    addQueryString('client.headers.' + name, settings.client.headers[name], buffer);
+    addQueryString('client.headers.' + name, settings['client']['headers'][name], buffer);
   }
   return buffer.join('&');
 }
