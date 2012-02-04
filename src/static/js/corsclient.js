@@ -83,8 +83,8 @@ function loadQueryString(str) {
 
 function getServerSettings() {
   var settings = {};
-  settings.enable = $('#server_enable').attr('checked');
-  settings.credentials = $('#server_credentials').attr('checked');
+  settings.enable = !!$('#server_enable').attr('checked');
+  settings.credentials = !!$('#server_credentials').attr('checked');
   settings.httpstatus = $('#server_httpstatus').val();
   settings.methods = $('#server_methods').val();
   settings.headers = $('#server_headers').val();
@@ -95,7 +95,7 @@ function getServerSettings() {
 function getClientSettings() {
   var settings = {};
   settings.method = $('#client_method').val();
-  settings.credentials = $('#client_credentials').attr('checked');
+  settings.credentials = !!$('#client_credentials').attr('checked');
   settings.headers = parseHeaders($('#client_headers').val());
   return settings;
 }
@@ -107,16 +107,16 @@ function getSettings() {
   return settings;
 }
 
-function getOrigin(location) {
-  if (location.origin) {
-    return location.origin;
+function getOrigin() {
+  if (window.location.origin) {
+    return window.location.origin;
   }
   // Firefox 3.6 doesn't have window.location.origin, construct the origin
   // header manually.
-  return location.protocol + '//' + location.host;
+  return window.location.protocol + '//' + window.location.host;
 }
 
-function getRequestUrl(settings) {
+function getServerRequestUrl(settings) {
   var url = serverUrl + '?';
   url += 'id=' + Math.floor(Math.random()*10000000);
   if (!settings.enable) {
@@ -293,7 +293,8 @@ function sendRequest() {
   logger.clear();
 
   var settings = getSettings();
-  var requestUrl = getRequestUrl(settings.server);
+  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + createLink(settings) + '\');return false;">Link to this test</a>');
+  var requestUrl = getServerRequestUrl(settings.server);
 
   var msg = 'Sending ' + settings.client.method + ' request to ' +
       requestUrl + '<br>';
@@ -353,6 +354,9 @@ function initializeDefaults(qs) {
     if (server['credentials'] == 'true') {
       $('#server_credentials').attr('checked', true);
     }
+    if (server['httpstatus']) {
+      $('#server_httpstatus').val(server['httpstatus']);
+    }
     if (server['methods']) {
       $('#server_methods').val(server['methods']);
     }
@@ -375,6 +379,40 @@ function initializeDefaults(qs) {
       $('#client_headers').val(getClientHeaders(client['headers']));
     }
   }
+}
+
+function addQueryString(key, val, buffer, opt_allowEmpty) {
+  allowEmpty = opt_allowEmpty || false;
+  if (val || allowEmpty) {
+    buffer.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+  }
+}
+
+function createQueryString(settings) {
+  var buffer = [];
+  addQueryString('server.enable', settings.server.enable, buffer, true);
+  addQueryString('server.credentials', settings.server.credentials, buffer);
+  addQueryString('server.httpstatus', settings.server.httpstatus, buffer);
+  addQueryString('server.methods', settings.server.methods, buffer);
+  addQueryString('server.headers', settings.server.headers, buffer);
+  addQueryString('server.exposeHeaders', settings.server.exposeHeaders, buffer);
+  addQueryString('client.method', settings.client.method, buffer);
+  addQueryString('client.credentials', settings.client.credentials, buffer);
+  for (var name in settings.client.headers) {
+    if (!settings.client.headers.hasOwnProperty(name)) {
+      continue;
+    }
+    addQueryString('client.headers.' + name, settings.client.headers[name], buffer);
+  }
+  return buffer.join('&');
+}
+
+function getDomain() {
+  return getOrigin() + window.location.pathname;
+}
+
+function createLink(settings) {
+  return getDomain() + '?' + createQueryString(settings);
 }
 
 function isCorsSupported() {
