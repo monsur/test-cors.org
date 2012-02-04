@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <project name="cors-api" basedir=".">
+  <taskdef name="jscomp"
+           classname="com.google.javascript.jscomp.ant.CompileTask"
+           classpath="bin/compiler.jar"/>
+
   <property name="application" value="cors-api"/>
 
   <target name="clean">
@@ -18,6 +22,17 @@
 
   <target name="server">
     <property name="destdir" location="web.server"/>
+  </target>
+
+  <target name="compilejs">
+    <!-- note this currently doesn't work //-->
+    <jscomp compilationLevel="advanced" debug="false"
+            processJqueryPrimitives="true"
+            output="${destdir}/static/js/corsclient.min.js">
+      <sources dir="${basedir}/src/static/js">
+        <file name="corsclient.js"/>
+      </sources>
+    </jscomp>
   </target>
 
   <target name="build.client">
