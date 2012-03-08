@@ -82,12 +82,12 @@ var buildHelpMenu = function() {
   var helper = function(datalist, menu) {
     for (var i = 0; i < datalist.length; i++) {
       var data = datalist[i];
-      menu.bind(data.id, data.message);
+      menu.bind(data['id'], data['message']);
     }
   };
 
-  helper(helpMenuData.server, serverHelpMenu);
-  helper(helpMenuData.client, clientHelpMenu);
+  helper(helpMenuData['server'], serverHelpMenu);
+  helper(helpMenuData['client'], clientHelpMenu);
 }
 
 
