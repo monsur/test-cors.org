@@ -1,6 +1,7 @@
 
 // TODO: Help descriptions for each item
 // TODO: Detect if there is a mismatch and we expect an error.
+// TODO: Closure compiler
 
 // Browser bugs:
 // Setting custom headers on GET requests in WebKit
@@ -321,6 +322,7 @@ function sendRequest() {
   }
   msg += headersMsg;
 
+  // TODO: functions should be inline in order to work in IE.
   xhr.onreadystatechange = handleReadyStateChange;
   xhr.onloadstart = handleLoadStart;
   xhr.onprogress = handleProgress;
