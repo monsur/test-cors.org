@@ -1,5 +1,4 @@
 
-// TODO: Help descriptions for each item
 // TODO: Detect if there is a mismatch and we expect an error.
 // TODO: Closure compiler
 // TODO: JQuery details
