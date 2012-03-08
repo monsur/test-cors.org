@@ -47,7 +47,7 @@ HelpMenu.prototype.showMessage = function(msg, topPos) {
   this.show(topPos);
 };
 
-HelpMenu.prototype.bind = function(msg, id) {
+HelpMenu.prototype.bind = function(id, msg) {
   var that = this;
   $('#' + id).hover(
     function() {
@@ -62,7 +62,34 @@ HelpMenu.prototype.bind = function(msg, id) {
 var clientHelpMenu = new HelpMenu('help-client');
 var serverHelpMenu = new HelpMenu('help-server');
 
-serverHelpMenu.bind('blah blah blah', 'div_server_enable');
+var helpMenuData = {
+  'server': [
+    {id: 'div_server_enable', message: 'Whether or not the server should allow CORS requests.'}
+  , {id: 'div_server_status', message: 'The HTTP Status code the server should respond with. Default: 200.'}
+  , {id: 'div_server_credentials', message: 'Whether the server should allow cookies on the request.'}
+  , {id: 'div_server_methods', message: 'Comma-delimited list of HTTP methods the server should allow.'}
+  , {id: 'div_server_headers', message: 'Comma-delimited list of HTTP headers the server should allow.'}
+  , {id: 'div_server_expose_headers', message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
+  ],
+  'client': [
+    {id: 'div_client_method', message: 'Which HTTP method the client should use when making the request.'}
+  , {id: 'div_client_credentials', message: 'Whether the client should include cookies in the request.'}
+  , {id: 'div_client_headers', message: 'A list of custom request headers to include in the request. One header per line, in the format key: value.'}
+  ]
+};
+
+var buildHelpMenu = function() {
+
+  var helper = function(datalist, menu) {
+    for (var i = 0; i < datalist.length; i++) {
+      var data = datalist[i];
+      menu.bind(data.id, data.message);
+    }
+  };
+
+  helper(helpMenuData.server, serverHelpMenu);
+  helper(helpMenuData.client, clientHelpMenu);
+}
 
 
 /**
@@ -481,6 +508,7 @@ $(document).ready(function(){
   if (isCorsSupported()) {
     var qs = loadQueryString(window.location.search || null);
     initializeDefaults(qs);
+    buildHelpMenu();
   } else {
     $('#content').hide();
     $('#corsnotsupported').show();
