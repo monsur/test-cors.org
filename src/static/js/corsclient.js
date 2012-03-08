@@ -339,40 +339,6 @@ function logCors(r) {
   logHttp('CORS Response', r['response']);
 }
 
-function handleReadyStateChange(event) {
-  logEvent('readystatechange');
-}
-
-function handleLoadStart(event) {
-  logEvent('loadstart');
-}
-
-function handleProgress(event) {
-  logEvent('progress');
-}
-
-function handleAbort(event) {
-  logEvent('abort', 'red');
-}
-
-function handleError(event) {
-  logEvent('error', 'red');
-  logXhr(event.currentTarget);
-}
-
-function handleLoad(event) {
-  logEvent('load', 'green');
-  logXhr(event.currentTarget);
-}
-
-function handleTimeout(event) {
-  logEvent('timeout', 'red');
-}
-
-function handleLoadEnd(event) {
-  logEvent('loadend');
-}
-
 function sendRequest() {
   logger.clear();
 
@@ -403,15 +369,39 @@ function sendRequest() {
   }
   msg += headersMsg;
 
-  // TODO: functions should be inline in order to work in IE.
-  xhr.onreadystatechange = handleReadyStateChange;
-  xhr.onloadstart = handleLoadStart;
-  xhr.onprogress = handleProgress;
-  xhr.onabort = handleAbort;
-  xhr.onerror = handleError;
-  xhr.onload = handleLoad;
-  xhr.ontimeout = handleTimeout;
-  xhr.onloadend = handleLoadEnd;
+  xhr.onreadystatechange = function() {
+    logEvent('readystatechange');
+  };
+
+  xhr.onloadstart = function() {
+    logEvent('loadstart');
+  };
+
+  xhr.onprogress = function() {
+    logEvent('progress');
+  };
+
+  xhr.onabort = function() {
+    logEvent('abort', 'red');
+  };
+
+  xhr.onerror = function() {
+    logEvent('error', 'red');
+    logXhr(xhr);
+  };
+
+  xhr.onload = function() {
+    logEvent('load', 'green');
+    logXhr(xhr);
+  };
+
+  xhr.ontimeout = function() {
+    logEvent('timeout', 'red');
+  };
+
+  xhr.onloadend = function() {
+    logEvent('loadend');
+  };
 
   logger.log(msg);
   xhr.send();
