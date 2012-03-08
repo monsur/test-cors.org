@@ -15,6 +15,59 @@ var serverUrl = '$SERVER/server';
 /**
  * @constructor
  */
+var HelpMenu = function(id) {
+  this.id_ = id;
+  this.elem_ = $('#' + id);
+  this.leftPos = this.elem_.offset().left;
+};
+
+HelpMenu.prototype.visibility = function(val) {
+  this.elem_.css('visibility', val);
+};
+
+HelpMenu.prototype.show = function(topPos) {
+  var coordinates = {
+    top: topPos,
+    left: this.leftPos
+  };
+  this.elem_.offset(coordinates);
+  this.visibility('visible');
+};
+
+HelpMenu.prototype.hide = function() {
+  this.visibility('hidden');
+};
+
+HelpMenu.prototype.setMessage = function(msg) {
+  this.elem_.html(msg);
+};
+
+HelpMenu.prototype.showMessage = function(msg, topPos) {
+  this.setMessage(msg);
+  this.show(topPos);
+};
+
+HelpMenu.prototype.bind = function(msg, id) {
+  var that = this;
+  $('#' + id).hover(
+    function() {
+      that.showMessage(msg, $(this).offset().top);
+    },
+    function() {
+      that.hide();
+    }
+  );
+};
+
+var clientHelpMenu = new HelpMenu('help-client');
+var serverHelpMenu = new HelpMenu('help-server');
+
+serverHelpMenu.bind('blah blah blah', 'div_server_enable');
+
+
+/**
+ * @constructor
+ */
 var Logger = function(opt_destinationId) {
   this.destinationId = '#' + (opt_destinationId || 'outputLog');
 };

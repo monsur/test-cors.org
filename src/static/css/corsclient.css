@@ -15,3 +15,7 @@
   color: #088A08;
 }
 
+#help-menu {
+  visibility: hidden;
+}
+
