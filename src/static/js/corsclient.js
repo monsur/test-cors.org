@@ -69,6 +69,7 @@ var helpMenuData = {
   , {id: 'div_server_methods', message: 'Comma-delimited list of HTTP methods the server should allow.'}
   , {id: 'div_server_headers', message: 'Comma-delimited list of HTTP headers the server should allow.'}
   , {id: 'div_server_expose_headers', message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
+  , {id: 'div_server_max_age', message: ''}
   ],
   'client': [
     {id: 'div_client_method', message: 'Which HTTP method the client should use when making the request.'}
@@ -172,6 +173,7 @@ function getServerSettings() {
   settings.methods = $('#server_methods').val();
   settings.headers = $('#server_headers').val();
   settings.exposeHeaders = $('#server_expose_headers').val();
+  settings.maxAge = $('#server_max_age').val();
   return settings;
 }
 
@@ -219,6 +221,9 @@ function getServerRequestUrl(settings) {
   }
   if (settings.exposeHeaders) {
     url += '&exposeHeaders=' + encodeURIComponent(settings.exposeHeaders);
+  }
+  if (settings.maxAge) {
+    url += '&maxAge=' + encodeURIComponent(settings.maxAge);
   }
   return url;
 }
@@ -440,6 +445,9 @@ function initializeDefaults(qs) {
     if (server['exposeHeaders']) {
       $('#server_expose_headers').val(server['exposeHeaders']);
     }
+    if (server['maxAge']) {
+      $('#server_max_age').val(server['maxAge']);
+    }
   }
   if ('client' in qs) {
     var client = qs['client'];
@@ -470,6 +478,7 @@ function createQueryString(settings) {
   addQueryString('server.methods', settings['server']['methods'], buffer);
   addQueryString('server.headers', settings['server']['headers'], buffer);
   addQueryString('server.exposeHeaders', settings['server']['exposeHeaders'], buffer);
+  addQueryString('server.maxAge', settings['server']['maxAge'], buffer);
   addQueryString('client.method', settings['client']['method'], buffer);
   addQueryString('client.credentials', settings['client']['credentials'], buffer);
   for (var name in settings['client']['headers']) {
@@ -503,3 +512,4 @@ $(document).ready(function(){
     $('#corsnotsupported').show();
   }
 });
+
