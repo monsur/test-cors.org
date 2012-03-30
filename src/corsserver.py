@@ -119,6 +119,8 @@ class CorsServer(webapp.RequestHandler):
       self.response.headers['Access-Control-Allow-Methods'] = config['methods']
     if config['headers'] != '':
       self.response.headers['Access-Control-Allow-Headers'] = config['headers']
+    if config['maxAge'] > 0:
+      self.response.headers['Access-Control-Max-Age'] = config['maxAge']
     self.__storeBody(config, 'preflight')
 
   def __storeBody(self, config, reqType):
@@ -150,6 +152,13 @@ class CorsServer(webapp.RequestHandler):
     config['headers'] = self.request.get('headers')
     config['exposeHeaders'] = self.request.get('exposeHeaders')
     config['id'] = self.request.get('id')
+
+    maxAge = -1
+    try:
+      maxAge = int(self.request.get('maxAge'))
+    except TypeError:
+      maxAge = -1
+    config['maxAge'] = maxAge
 
     httpstatus = self.request.get('httpstatus')
     if httpstatus:
