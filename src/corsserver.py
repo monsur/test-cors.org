@@ -156,7 +156,7 @@ class CorsServer(webapp.RequestHandler):
     maxAge = -1
     try:
       maxAge = int(self.request.get('maxAge'))
-    except TypeError:
+    except:
       maxAge = -1
     config['maxAge'] = maxAge
 
