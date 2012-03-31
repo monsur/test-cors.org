@@ -69,7 +69,7 @@ var helpMenuData = {
   , {id: 'div_server_methods', message: 'Comma-delimited list of HTTP methods the server should allow.'}
   , {id: 'div_server_headers', message: 'Comma-delimited list of HTTP headers the server should allow.'}
   , {id: 'div_server_expose_headers', message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
-  , {id: 'div_server_max_age', message: ''}
+  , {id: 'div_server_max_age', message: 'The time, in seconds, that the preflight response should be cached for.'}
   ],
   'client': [
     {id: 'div_client_method', message: 'Which HTTP method the client should use when making the request.'}
