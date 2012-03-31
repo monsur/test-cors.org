@@ -201,9 +201,19 @@ function getOrigin() {
   return window.location.protocol + '//' + window.location.host;
 }
 
+function getId(settings) {
+  // If maxAge has a value, it means we want the preflight response to be
+  // cached. However, preflights are cached by request url. In order for
+  // request url to be an exact match, we set it to a fixed id.
+  if (settings.maxAge) {
+    return 'preflightcache';
+  }
+  return Math.floor(Math.random()*10000000);
+}
+
 function getServerRequestUrl(settings) {
   var url = serverUrl + '?';
-  url += 'id=' + Math.floor(Math.random()*10000000);
+  url += 'id=' + getId(settings);
   if (!settings.enable) {
     url += '&enable=false';
   }
