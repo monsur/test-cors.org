@@ -142,6 +142,17 @@ class CorsServer(webapp.RequestHandler):
         memcache.delete(id)
     return body
 
+  def __parseHeaders(self, headers_str):
+    headers = {}
+    if headers_str:
+      for line in headers_str.splitlines():
+        header = line.split(':', 2)
+        if len(header) == 2:
+          key = header[0]
+          val = header[1]
+          headers[key] = val
+    return headers
+
   def __getConfig(self, httpMethod):
     config = {}
     config['enable'] = self.request.get('enable', True)
@@ -152,6 +163,7 @@ class CorsServer(webapp.RequestHandler):
     config['headers'] = self.request.get('headers')
     config['exposeHeaders'] = self.request.get('exposeHeaders')
     config['id'] = self.request.get('id')
+    config['responseHeaders'] = self.__parseHeaders(self.request.get('responseHeaders'))
 
     maxAge = -1
     try:
