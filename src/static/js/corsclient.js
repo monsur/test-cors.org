@@ -10,85 +10,54 @@
 var serverUrl = '$SERVER/server';
 
 
-/**
- * @constructor
- */
-var HelpMenu = function(id) {
-  this.id_ = id;
-  this.elem_ = $('#' + id);
-  this.leftPos = this.elem_.offset().left;
-};
+var HelpMenu = {};
 
-HelpMenu.prototype.visibility = function(val) {
-  this.elem_.css('visibility', val);
-};
+HelpMenu.DIV = $('#help-menu');
 
-HelpMenu.prototype.show = function(topPos) {
+HelpMenu.show = function() {
+  var id = $(this).attr('id');
+  var offset = $(this).offset();
+  var msg = HelpMenu.DATA[id].message;
+  HelpMenu.DIV.text(msg);
+
+  var left = offset.left;
+  if (id.indexOf('div_client') != -1) {
+    left = left - 200;
+  } else {
+    left = left + $(this).width() + 20;
+  }
   var coordinates = {
-    top: topPos,
-    left: this.leftPos
+    top: offset.top,
+    left: left
   };
-  this.elem_.offset(coordinates);
-  this.visibility('visible');
+  HelpMenu.DIV.offset(coordinates);
+
+  HelpMenu.DIV.css('visibility', 'visible');
 };
 
-HelpMenu.prototype.hide = function() {
-  this.visibility('hidden');
+HelpMenu.hide = function() {
+  HelpMenu.DIV.css('visibility', 'hidden');
 };
 
-HelpMenu.prototype.setMessage = function(msg) {
-  this.elem_.html(msg);
-};
-
-HelpMenu.prototype.showMessage = function(msg, topPos) {
-  this.setMessage(msg);
-  this.show(topPos);
-};
-
-HelpMenu.prototype.bind = function(id, msg) {
-  var that = this;
-  $('#' + id).hover(
-    function() {
-      that.showMessage(msg, $(this).offset().top);
-    },
-    function() {
-      that.hide();
-    }
-  );
-};
-
-var clientHelpMenu = new HelpMenu('help-client');
-var serverHelpMenu = new HelpMenu('help-server');
-
-var helpMenuData = {
-  'server': [
-    {id: 'div_server_enable', message: 'Whether or not the server should allow CORS requests.'}
-  , {id: 'div_server_status', message: 'The HTTP Status code the server should respond with. Default: 200.'}
-  , {id: 'div_server_credentials', message: 'Whether the server should allow cookies on the request.'}
-  , {id: 'div_server_methods', message: 'Comma-delimited list of HTTP methods the server should allow.'}
-  , {id: 'div_server_headers', message: 'Comma-delimited list of HTTP headers the server should allow.'}
-  , {id: 'div_server_expose_headers', message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
-  , {id: 'div_server_max_age', message: 'The time, in seconds, that the preflight response should be cached for.'}
-  ],
-  'client': [
-    {id: 'div_client_method', message: 'Which HTTP method the client should use when making the request.'}
-  , {id: 'div_client_credentials', message: 'Whether the client should include cookies in the request.'}
-  , {id: 'div_client_headers', message: 'A list of custom request headers to include in the request. One header per line, in the format key: value.'}
-  ]
+HelpMenu.DATA = {
+    'div_server_enable': { message: 'Whether or not the server should allow CORS requests.'}
+  , 'div_server_status': { message: 'The HTTP Status code the server should respond with. Default: 200.'}
+  , 'div_server_credentials': { message: 'Whether the server should allow cookies on the request.'}
+  , 'div_server_methods': { message: 'Comma-delimited list of HTTP methods the server should allow.'}
+  , 'div_server_headers': { message: 'Comma-delimited list of HTTP headers the server should allow.'}
+  , 'div_server_expose_headers': { message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
+  , 'div_server_max_age': { message: 'The time, in seconds, that the preflight response should be cached for.'}
+  , 'div_client_method': { message: 'Which HTTP method the client should use when making the request.'}
+  , 'div_client_credentials': { message: 'Whether the client should include cookies in the request.'}
+  , 'div_client_headers': { message: 'A list of custom request headers to include in the request. One header per line, in the format key: value.'}
 };
 
 var buildHelpMenu = function() {
+  for (id in HelpMenu.DATA) {
+    $('#' + id).hover(HelpMenu.show, HelpMenu.hide);
+  }
+};
 
-  var helper = function(datalist, menu) {
-    for (var i = 0; i < datalist.length; i++) {
-      var data = datalist[i];
-      menu.bind(data['id'], data['message']);
-    }
-  };
-
-  helper(helpMenuData['server'], serverHelpMenu);
-  helper(helpMenuData['client'], clientHelpMenu);
-}
 
 
 /**

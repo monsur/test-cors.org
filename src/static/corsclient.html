@@ -3,142 +3,119 @@
   <head>
     <meta charset="utf-8">
     <title>CORS API Client</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="css/corsclient.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/corsclient.css" type="text/css" media="all" />
   </head>
 <body>
 
-<div class="container-fluid">
+<table class="tblPage">
 
-<form class="form-horizontal">
+<tr><td width="50%"> <!-- Left side -->
 
-  <div class="row-fluid">
+  <table width="100%">
+    <tr><th colspan="2">
+      Client
+    </th></tr>
 
-    <div class="span2">
-     <div id="help-server" class="help-menu">&nbsp;</div> 
-    </div>
+    <tr id="div_client_method"><td class="form_label">
+        <label for="client_method">HTTP Method</label>
+    </td><td class="form_input">
+        <select type="select" id="client_method">
+          <option value="HEAD">HEAD</option>
+          <option value="GET" selected>GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+          <option value="OPTION">OPTION</option>
+        </select>
+    </td></tr>
 
-    <div class="span3">
+    <tr id="div_client_credentials"><td class="form_label">
+      <label for="client_credentials">With credentials?</label>
+    </td><td class="form_input">
+      <input type="checkbox" id="client_credentials" />
+    </td></tr>
 
-      <fieldset>
-        <legend>Server</legend>
+    <tr id="div_client_headers"><td class="form_label">
+      <label for="client_headers">Custom Headers</label>
+    </td><td class="form_input">
+      <textarea id="client_headers"></textarea>
+    </td></tr>
 
-          <div class="control-group" id="div_server_enable">
-            <label class="control-label" for="server_enable">Enable CORS</label>
-            <div class="controls">
-              <input type="checkbox" id="server_enable" checked />
-            </div>
-          </div>
+    <tr><td></td><td class="form_input">
+      <input type="submit" id="client_sendRequest" value="Send Request" onclick="sendRequest(); return false;" />
+    </td></tr>
 
-          <div class="control-group" id="div_server_status">
-            <label class="control-label" for="server_status">HTTP Status</label>
-            <div class="controls">
-              <input type="text" id="server_httpstatus" value="200" class="span3 input-medium" />
-            </div>
-          </div>
+  </table>
 
-          <div class="control-group" id="div_server_credentials">
-            <label class="control-label" for="server_credentials">Allow Credentials</label>
-            <div class="controls">
-              <input type="checkbox" id="server_credentials" />
-            </div>
-          </div>
+</td><td width="50%"> <!-- Right side -->
 
+  <table width="100%">
+    <tr><th colspan="2">
+      Server
+    </th></tr>
 
-          <div class="control-group" id="div_server_methods">
-            <label class="control-label" for="server_methods">Allow Methods</label>
-            <div class="controls">
-              <input type="text" id="server_methods" class="input-medium" />
-            </div>
-          </div>
+    <tr id="div_server_enable"><td class="form_label">
+      <label for="server_enable">Enable CORS</label>
+    </td><td class="form_input">
+      <input type="checkbox" id="server_enable" checked />
+    </td></tr>
 
+    <tr id="div_server_httpstatus"><td class="form_label">
+      <label for="server_status">HTTP Status</label>
+    </td><td class="form_input">
+      <input type="text" id="server_httpstatus" value="200" />
+    </td></tr>
 
-          <div class="control-group" id="div_server_headers">
-            <label class="control-label" for="server_headers">Allow Headers</label>
-            <div class="controls">
-              <input type="text" id="server_headers" class="input-medium" />
-            </div>
-          </div>
+    <tr id="div_server_credentials"><td class="form_label">
+      <label for="server_credentials">Allow Credentials</label>
+    </td><td class="form_input">
+      <input type="checkbox" id="server_credentials" />
+    </td></tr>
 
+    <tr id="div_server_methods"><td class="form_label">
+      <label for="server_methods">Allow Methods</label>
+    </td><td class="form_input">
+      <input type="text" id="server_methods" />
+    </td></tr>
 
-          <div class="control-group" id="div_server_expose_headers">
-            <label class="control-label" for="server_expose_headers">Expose Headers</label>
-            <div class="controls">
-              <input type="text" id="server_expose_headers" class="input-medium" />
-            </div>
-          </div>
+    <tr id="div_server_headers"><td class="form_label">
+      <label for="server_headers">Allow Headers</label>
+    </td><td class="form_input">
+      <input type="text" id="server_headers" />
+    </td></tr>
 
-          <div class="control-group" id="div_server_max_age">
-           <label class="control-label" for="server_max_age">Max Age</label>
-            <div class="controls">
-              <input type="text" id="server_max_age" class="span3 input-medium" />
-            </div>
-          </div>
+    <tr id="div_server_expose_headers"><td class="form_label">
+      <label for="server_expose_headers">Expose Headers</label>
+    </td><td class="form_input">
+      <input type="text" id="server_expose_headers" />
+    </td></tr>
 
+    <tr id="div_server_max_age"><td class="form_label">
+      <label for="server_max_age">Max Age</label>
+    </td><td class="form_input">
+      <input type="text" id="server_max_age" />
+    </td></tr>
 
-      </fieldset>
+    <tr id="div_server_response_headers"><td class="form_label">
+      <label for="server_response_headers">Response Headers</label>
+    </td><td class="form_input">
+      <textarea id="server_response_headers"></textarea>
+    </td></tr>
 
-    </div>
-    <div class="span3">
+  </table>
 
-      <fieldset>
-        <legend>Client</legend>
-      </fieldset>
+</td></tr>
 
-          <div class="control-group" id="div_client_method">
-            <label class="control-label" for="client_method">HTTP Method</label>
-            <div class="controls">
-              <input type="text" id="client_method" value="GET" class="input-medium" />
-            </div>
-          </div>
+</table>
 
-          <div class="control-group" id="div_client_credentials">
-            <label class="control-label" for="client_credentials">With Credentials</label>
-            <div class="controls">
-              <input type="checkbox" id="client_credentials" />
-            </div>
-          </div>
+<table class="tblPage">
+<tr><th>Log</th></tr>
+<tr><td>
+  <div id="outputLog"></div>
+</td></tr>
+</table>
 
-          <div class="control-group" id="div_client_headers">
-            <label class="control-label" for="client_headers">Headers</label>
-            <div class="controls">
-              <textarea id="client_headers" class="input-medium"></textarea>
-            </div>
-          </div>
-
-          <div class="submit-button-container">
-            <input type="submit" id="client_sendRequest" value="Send Request" class="btn-primary" onclick="sendRequest(); return false;" />
-          </div>
-
-    </div>
-
-    <div class="span2">
-     <div id="help-client" class="help-menu">&nbsp;</div>
-    </div>
-
-   </div>
-   <div class="row-fluid">
-
-    <div class="span2">&nbsp;</div>
-
-    <div class="span6">
-
-      <fieldset>
-        <legend>Log</legend>
-
-        <div id="outputLog">
-        </div>
-
-      </fieldset>
-
-    </div>
-
-    <div class="span2">&nbsp;</div>
-
-  </div>
-</form>
-</div>
+<div id="help-menu"></div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
 <script src="js/corsclient.js"></script>

@@ -1,6 +1,21 @@
-.submit-button-container {
- float: right;
- margin-top: 50px;
+td {
+  vertical-align: top;
+}
+
+.tblPage {
+  width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form_label {
+  text-align: right;
+}
+
+#help-menu {
+  position: absolute;
+  width: 165px;
+  visibility: hidden;
 }
 
 .log-red {
@@ -13,9 +28,5 @@
 
 .log-green {
   color: #088A08;
-}
-
-#help-menu {
-  visibility: hidden;
 }
 
