@@ -4,9 +4,8 @@
 // TODO: JQuery details
 
 // Browser bugs:
-// Setting custom headers on GET requests in WebKit
 // Setting cookies in Safari?
-// Reading response headers from Chrome?
+// Reading response headers from Firefox?
 
 var serverUrl = '$SERVER/server';
 
