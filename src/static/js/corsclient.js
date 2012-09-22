@@ -24,7 +24,7 @@ HelpMenu.show = function() {
   if (id.indexOf('div_client') != -1) {
     left = left - 200;
   } else {
-    left = left + $(this).width() + 20;
+    left = left + $(this).width() + 10;
   }
   var coordinates = {
     top: offset.top,
@@ -47,6 +47,7 @@ HelpMenu.DATA = {
   , 'div_server_headers': { message: 'Comma-delimited list of HTTP headers the server should allow.'}
   , 'div_server_expose_headers': { message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
   , 'div_server_max_age': { message: 'The time, in seconds, that the preflight response should be cached for.'}
+  , 'div_server_response_headers': { message: ''}
   , 'div_client_method': { message: 'Which HTTP method the client should use when making the request.'}
   , 'div_client_credentials': { message: 'Whether the client should include cookies in the request.'}
   , 'div_client_headers': { message: 'A list of custom request headers to include in the request. One header per line, in the format key: value.'}
@@ -57,7 +58,6 @@ var buildHelpMenu = function() {
     $('#' + id).hover(HelpMenu.show, HelpMenu.hide);
   }
 };
-
 
 
 /**
@@ -93,8 +93,8 @@ Logger.prototype.clear = function() {
   $(this.destinationId).empty();
 };
 
-
 var logger = new Logger();
+
 
 function loadQueryString(str) {
   if (typeof(str) != 'string' || str.length == 0) {
@@ -142,6 +142,7 @@ function getServerSettings() {
   settings.headers = $('#server_headers').val();
   settings.exposeHeaders = $('#server_expose_headers').val();
   settings.maxAge = $('#server_max_age').val();
+  settings.responseHeaders = parseHeaders($('#server_response_headers').val());
   return settings;
 }
 
@@ -202,6 +203,9 @@ function getServerRequestUrl(settings) {
   }
   if (settings.maxAge) {
     url += '&maxAge=' + encodeURIComponent(settings.maxAge);
+  }
+  if (settings.responseHeaders) {
+    url += '&responseHeaders=' + encodeURIComponent(serializeHeaders(settings.responseHeaders));
   }
   return url;
 }
@@ -389,7 +393,7 @@ function sendRequest() {
   xhr.send();
 }
 
-function getClientHeaders(headers) {
+function serializeHeaders(headers) {
   var retstr = '';
   for (var name in headers) {
     if (!headers.hasOwnProperty(name)) {
@@ -426,6 +430,9 @@ function initializeDefaults(qs) {
     if (server['maxAge']) {
       $('#server_max_age').val(server['maxAge']);
     }
+    if (server['responseHeaders']) {
+      $('#server_response_headers').val(serializeHeaders(server['responseHeaders']));
+    }
   }
   if ('client' in qs) {
     var client = qs['client'];
@@ -436,7 +443,7 @@ function initializeDefaults(qs) {
       $('#client_credentials').attr('checked', true);
     }
     if ('headers' in client) {
-      $('#client_headers').val(getClientHeaders(client['headers']));
+      $('#client_headers').val(serializeHeaders(client['headers']));
     }
   }
 }
@@ -457,14 +464,24 @@ function createQueryString(settings) {
   addQueryString('server.headers', settings['server']['headers'], buffer);
   addQueryString('server.exposeHeaders', settings['server']['exposeHeaders'], buffer);
   addQueryString('server.maxAge', settings['server']['maxAge'], buffer);
+
+  for (var name in settings['server']['responseHeaders']) {
+    if (!settings['server']['responseHeaders'].hasOwnProperty(name)) {
+      continue;
+    }
+    addQueryString('server.responseHeaders.' + name, settings['server']['responseHeaders'][name], buffer);
+  }
+
   addQueryString('client.method', settings['client']['method'], buffer);
   addQueryString('client.credentials', settings['client']['credentials'], buffer);
+
   for (var name in settings['client']['headers']) {
     if (!settings['client']['headers'].hasOwnProperty(name)) {
       continue;
     }
     addQueryString('client.headers.' + name, settings['client']['headers'][name], buffer);
   }
+
   return buffer.join('&');
 }
 
