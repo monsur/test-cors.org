@@ -94,9 +94,9 @@ class CorsServer(webapp.RequestHandler):
     if 'credentials' in config and config['credentials'] == True:
       self.response.headers['Access-Control-Allow-Credentials'] = 'true'
 
-  def __exposeResponseHeaders(self, header_list, response):
-    for header in header_list:
-      response.headers[header] = header + '_value'
+  def __addResponseHeaders(self, headers, response):
+    for key, val in headers.items():
+      response.headers[key] = val
 
   def __handleCors(self, config):
     self.__addCorsHeaders(config)
@@ -106,7 +106,9 @@ class CorsServer(webapp.RequestHandler):
       exposeHeaders = config['exposeHeaders']
     if exposeHeaders:
       self.response.headers['Access-Control-Expose-Headers'] = exposeHeaders
-      self.__exposeResponseHeaders(exposeHeaders.split(','), self.response)
+
+    if config['responseHeaders']:
+      self.__addResponseHeaders(config['responseHeaders'], self.response)
 
     config['body'] = self.__retrieveBody(config, 'cors')
 
