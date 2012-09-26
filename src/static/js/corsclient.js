@@ -330,7 +330,8 @@ function sendRequest() {
 
   var settings = getSettings();
   logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + createLink(settings) + '\');return false;">Link to this test</a>');
-  var requestUrl = getServerRequestUrl(settings['server']);
+  var requestUrl = $('#server_url').val() ||
+                   getServerRequestUrl(settings['server']);
 
   var msg = 'Sending ' + settings['client']['method'] + ' request to ' +
       requestUrl + '<br>';
