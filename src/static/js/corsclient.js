@@ -334,7 +334,7 @@ function sendRequest() {
                    getServerRequestUrl(settings['server']);
 
   var msg = 'Sending ' + settings['client']['method'] + ' request to ' +
-      requestUrl + '<br>';
+      '<code>' + requestUrl + '</code><br>';
 
   var xhr = createCORSRequest(settings['client']['method'], requestUrl);
 
