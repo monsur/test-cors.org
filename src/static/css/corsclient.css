@@ -13,6 +13,10 @@ td {
   margin-bottom: 10px;
 }
 
+.tblServer {
+  width: 100%;
+}
+
 .form_label {
   text-align: right;
 }

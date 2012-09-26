@@ -63,7 +63,8 @@
 
 </td><td width="50%"> <!-- Right side -->
 
-  <table width="100%" id="remote_server" style="display: none;">
+  <div id="remote_server" style="display: none;">
+  <table class="tblServer">
     <tr><th colspan="2">
       Remote Server <a href="#" onclick="switchServer(); return false;">Test Server</a>
     </th></tr>
@@ -75,9 +76,10 @@
     </td></tr>
 
   </table>
+  </div>
 
-
-  <table width="100%" id="test_server" style="display: none;">
+  <div id="test_server" style="display: none">
+  <table class="tblServer">
     <tr><th colspan="2">
       Test Server <a href="#" onclick="switchServer(); return false;">Remote Server</a>
     </th></tr>
@@ -131,6 +133,7 @@
     </td></tr>
 
   </table>
+  </div>
 
 </td></tr>
 
