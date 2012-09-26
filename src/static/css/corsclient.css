@@ -1,3 +1,7 @@
+th {
+  background-color: #A3E0FF;
+}
+
 td {
   vertical-align: top;
 }
@@ -6,6 +10,7 @@ td {
   width: 800px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 10px;
 }
 
 .form_label {
