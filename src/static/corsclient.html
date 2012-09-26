@@ -63,9 +63,9 @@
 
 </td><td width="50%"> <!-- Right side -->
 
-  <table width="100%" id="remote_server">
+  <table width="100%" id="remote_server" style="display: none;">
     <tr><th colspan="2">
-      Remote Server
+      Remote Server <a href="#" onclick="switchServer(); return false;">Test Server</a>
     </th></tr>
 
     <tr id="div_server_url"><td class="form_label">
@@ -77,9 +77,9 @@
   </table>
 
 
-  <table width="100%" id="test_server">
+  <table width="100%" id="test_server" style="display: none;">
     <tr><th colspan="2">
-      Test Server
+      Test Server <a href="#" onclick="switchServer(); return false;">Remote Server</a>
     </th></tr>
 
     <tr id="div_server_enable"><td class="form_label">

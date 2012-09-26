@@ -143,6 +143,7 @@ function getServerSettings() {
   settings.exposeHeaders = $('#server_expose_headers').val();
   settings.maxAge = $('#server_max_age').val();
   settings.responseHeaders = parseHeaders($('#server_response_headers').val());
+  settings.url = $('#server_url').val();
   return settings;
 }
 
@@ -434,7 +435,11 @@ function initializeDefaults(qs) {
     if (server['responseHeaders']) {
       $('#server_response_headers').val(serializeHeaders(server['responseHeaders']));
     }
+    if (server['url']) {
+      $('#server_url').val(server['url']);
+    }
   }
+
   if ('client' in qs) {
     var client = qs['client'];
     if (client['method']) {
@@ -447,6 +452,12 @@ function initializeDefaults(qs) {
       $('#client_headers').val(serializeHeaders(client['headers']));
     }
   }
+
+  if (qs['server'] && qs['server']['mode'] == 'test') {
+    $('#test_server').css('display', 'block');
+  } else {
+    $('#remote_server').css('display', 'block');
+  }
 }
 
 function addQueryString(key, val, buffer, opt_allowEmpty) {
@@ -458,19 +469,30 @@ function addQueryString(key, val, buffer, opt_allowEmpty) {
 
 function createQueryString(settings) {
   var buffer = [];
-  addQueryString('server.enable', settings['server']['enable'], buffer, true);
-  addQueryString('server.credentials', settings['server']['credentials'], buffer);
-  addQueryString('server.httpstatus', settings['server']['httpstatus'], buffer);
-  addQueryString('server.methods', settings['server']['methods'], buffer);
-  addQueryString('server.headers', settings['server']['headers'], buffer);
-  addQueryString('server.exposeHeaders', settings['server']['exposeHeaders'], buffer);
-  addQueryString('server.maxAge', settings['server']['maxAge'], buffer);
 
-  for (var name in settings['server']['responseHeaders']) {
-    if (!settings['server']['responseHeaders'].hasOwnProperty(name)) {
-      continue;
+  var mode = 'remote';
+  if ($('#test_server').css('display') == 'block') {
+    mode = 'test';
+  }
+  addQueryString('server.mode', mode, buffer);
+
+  if (mode == 'test') {
+    addQueryString('server.enable', settings['server']['enable'], buffer, true);
+    addQueryString('server.credentials', settings['server']['credentials'], buffer);
+    addQueryString('server.httpstatus', settings['server']['httpstatus'], buffer);
+    addQueryString('server.methods', settings['server']['methods'], buffer);
+    addQueryString('server.headers', settings['server']['headers'], buffer);
+    addQueryString('server.exposeHeaders', settings['server']['exposeHeaders'], buffer);
+    addQueryString('server.maxAge', settings['server']['maxAge'], buffer);
+
+    for (var name in settings['server']['responseHeaders']) {
+      if (!settings['server']['responseHeaders'].hasOwnProperty(name)) {
+        continue;
+      }
+      addQueryString('server.responseHeaders.' + name, settings['server']['responseHeaders'][name], buffer);
     }
-    addQueryString('server.responseHeaders.' + name, settings['server']['responseHeaders'][name], buffer);
+  } else {
+    addQueryString('server.url', settings['server']['url'], buffer);
   }
 
   addQueryString('client.method', settings['client']['method'], buffer);
@@ -484,6 +506,16 @@ function createQueryString(settings) {
   }
 
   return buffer.join('&');
+}
+
+function switchServer() {
+  if ($('#remote_server').css('display') == 'block') {
+    $('#remote_server').css('display', 'none');
+    $('#test_server').css('display', 'block');
+  } else {
+    $('#remote_server').css('display', 'block');
+    $('#test_server').css('display', 'none');
+  }
 }
 
 function getDomain() {
