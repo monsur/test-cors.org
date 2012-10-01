@@ -1,7 +1,6 @@
 
 // TODO: Detect if there is a mismatch and we expect an error.
 // TODO: Closure compiler
-// TODO: JQuery details
 
 // Browser bugs:
 // Setting cookies in Safari?
