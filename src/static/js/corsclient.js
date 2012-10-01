@@ -46,7 +46,7 @@ HelpMenu.DATA = {
   , 'div_server_headers': { message: 'Comma-delimited list of HTTP headers the server should allow.'}
   , 'div_server_expose_headers': { message: 'Comma-delimited list of HTTP response headers that the client should be able to view.'}
   , 'div_server_max_age': { message: 'The time, in seconds, that the preflight response should be cached for.'}
-  , 'div_server_response_headers': { message: ''}
+  , 'div_server_response_headers': { message: 'Custom headers to include in the server response.'}
   , 'div_client_method': { message: 'Which HTTP method the client should use when making the request.'}
   , 'div_client_credentials': { message: 'Whether the client should include cookies in the request.'}
   , 'div_client_headers': { message: 'A list of custom request headers to include in the request. One header per line, in the format key: value.'}
@@ -143,6 +143,7 @@ function getServerSettings() {
   settings.maxAge = $('#server_max_age').val();
   settings.responseHeaders = parseHeaders($('#server_response_headers').val());
   settings.url = $('#server_url').val();
+  settings.mode = getServerMode();
   return settings;
 }
 
@@ -181,6 +182,10 @@ function getId(settings) {
 }
 
 function getServerRequestUrl(settings) {
+  if (settings['mode'] == 'remote') {
+    return settings['url'];
+  }
+
   var url = serverUrl + '?';
   url += 'id=' + getId(settings);
   if (!settings.enable) {
@@ -330,8 +335,7 @@ function sendRequest() {
 
   var settings = getSettings();
   logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + createLink(settings) + '\');return false;">Link to this test</a>');
-  var requestUrl = $('#server_url').val() ||
-                   getServerRequestUrl(settings['server']);
+  var requestUrl = getServerRequestUrl(settings['server']);
 
   var msg = 'Sending ' + settings['client']['method'] + ' request to ' +
       '<code>' + requestUrl + '</code><br>';
@@ -466,13 +470,18 @@ function addQueryString(key, val, buffer, opt_allowEmpty) {
   }
 }
 
-function createQueryString(settings) {
-  var buffer = [];
-
+function getServerMode() {
   var mode = 'remote';
   if ($('#test_server').css('display') == 'block') {
     mode = 'test';
   }
+  return mode;
+}
+
+function createQueryString(settings) {
+  var buffer = [];
+
+  var mode = settings['server']['mode'];
   addQueryString('server.mode', mode, buffer);
 
   if (mode == 'test') {
