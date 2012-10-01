@@ -259,6 +259,11 @@ function logXhr(xhr) {
   }
 
   var msg = '';
+  var headers = xhr.getAllResponseHeaders();
+  if (headers) {
+    logger.log('XHR exposed response headers: <pre class="headers">' + headers + '</pre>');
+  }
+/*
   var headers = parseHeaders(xhr.getAllResponseHeaders());
   for (var name in headers) {
     if (!headers.hasOwnProperty(name)) {
@@ -272,6 +277,7 @@ function logXhr(xhr) {
   if (msg.length > 0) {
     logger.log('XHR exposed response headers: ' + msg);
   }
+*/
 
   var text = xhr.responseText;
   if (text) {
