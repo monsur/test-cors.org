@@ -1,46 +1,33 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+<html lang="en">
+ <head>
+  <link href="css/bootstrap-2.2.1.min.css" rel="stylesheet" media="screen">
+ </head>
+ <body>
 
-        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  <div class="container">
 
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="css/corsclient.css">
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
-        <![endif]-->
+  <div class="row">
+    <div class="span1"></div>
+    <div class="span10">
 
-<table class="tblPage">
-<tr><td>
-<h2>CORS test page</h1>
-<p>Use this page to test CORS requests. You can either send the CORS request to a remote server (to test if CORS is supported), or send the CORS request to a test server (to explore certain features of CORS). This page is under continual development; feedback is appreciated: <a href="mailto:monsur@gmail.com">monsur@gmail.com</a>.</p>
-</td></tr>
-</table>
+<div class="row" id="intro">
+  <div class="span10">
+    <h1>CORS test page</h1>
 
-<table class="tblPage">
+    <p>Use this page to test CORS requests. You can either send the CORS request to a remote server (to test if CORS is supported), or send the CORS request to a test server (to explore certain features of CORS). This page is under continual development; feedback is appreciated: <a href="mailto:monsur@gmail.com">monsur@gmail.com</a>.</p>
+  </div>
+</div>
 
-<tr><td width="50%"> <!-- Left side -->
+<div class="row" id="inputs">
+  <div class="span5">
+    <form class="form-horizontal">
+    <legend>Client</legend>
 
-  <table class="tblInner">
-    <tr><th colspan="2">
-      Client
-    </th></tr>
-
-    <tr id="div_client_method"><td class="form_label">
-        <label for="client_method">HTTP Method</label>
-    </td><td class="form_input">
-        <select type="select" id="client_method">
+    <div class="control-group">
+      <label class="control-label" for="client_method">HTTP Method</label>
+      <div class="controls">
+        <select id="client_method" class="span2">
           <option value="HEAD">HEAD</option>
           <option value="GET" selected>GET</option>
           <option value="POST">POST</option>
@@ -48,129 +35,135 @@
           <option value="DELETE">DELETE</option>
           <option value="OPTION">OPTION</option>
         </select>
-    </td></tr>
+      </div>
+    </div>
 
-    <tr id="div_client_credentials"><td class="form_label">
-      <label for="client_credentials">With credentials?</label>
-    </td><td class="form_input">
-      <input type="checkbox" id="client_credentials" />
-    </td></tr>
+    <div class="control-group">
+      <label class="control-label" for="client_credentials">With credentials?</label>
+      <div class="controls">
+        <input type="checkbox" id="client_credentials" />
+      </div>
+    </div>
 
-    <tr id="div_client_headers"><td class="form_label">
-      <label for="client_headers">Custom Headers</label>
-    </td><td class="form_input">
-      <textarea id="client_headers"></textarea>
-    </td></tr>
+    <div class="control-group">
+      <label class="control-label" for="client_headers">Request Headers</label>
+      <div class="controls">
+        <textarea id="client_headers" class="span2" rows="4"></textarea>
+      </div>
+    </div>
 
-    <tr><td></td><td class="form_input">
-      <input type="submit" id="client_sendRequest" value="Send Request" onclick="sendRequest(); return false;" />
-    </td></tr>
+    <div class="control-group">
+    <div class="controls">
+      <button class="btn btn-large btn-primary" type="button">Send Request</button>
+    </div></div>
 
-  </table>
+    </form>
+  </div>
+  <div class="span5">
+    <form class="form-horizontal">
+    <legend>Server</legend>
+    <ul class="nav nav-tabs" id="server_tabs">
+      <li><a href="#remote" data-toggle="tab">Remote</a></li>
+      <li><a href="#local" data-toggle="tab">Local</a></li>
+    </ul>
 
-</td><td width="50%"> <!-- Right side -->
+    <div class="tab-content">
+      <div class="tab-pane" id="remote">
 
-  <div id="remote_server" style="display: none;">
-  <table class="tblInner">
-    <tr><th colspan="2">
-      Remote Server <a href="#" onclick="switchServer(); return false;">Test Server</a>
-    </th></tr>
+        <div class="control-group">
+          <label class="control-label" for="server_url">Remote URL</label>
+          <div class="controls">
+            <input type="text" id="server_url" class="span2" />
+          </div>
+        </div>
+        
+      </div>
 
-    <tr id="div_server_url"><td class="form_label">
-      <label for="server_url">Remote URL</label>
-    </td><td class="form_input">
-      <input type="text" id="server_url" />
-    </td></tr>
+      <div class="tab-pane" id="local">
 
-  </table>
+        <div class="control-group">
+          <label class="control-label" for="server_enable">Enable CORS</label>
+          <div class="controls">
+            <input type="checkbox" id="server_enable" checked />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_status">HTTP Status</label>
+          <div class="controls">
+<input type="text" id="server_httpstatus" value="200" class="span1" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_credentials">Allow Credentials</label>
+          <div class="controls">
+            <input type="checkbox" id="server_credentials" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_methods">Allow Methods</label>
+          <div class="controls">
+            <input type="text" id="server_methods" class="span2" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_headers">Allow Headers</label>
+          <div class="controls">
+            <input type="text" id="server_headers" class="span2" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_expose_headers">Expose Headers</label>
+          <div class="controls">
+            <input type="text" id="server_expose_headers" class="span2" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_max_age">Max Age</label>
+          <div class="controls">
+            <input type="text" id="server_max_age" class="span2" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="server_response_headers">Response Headers</label>
+          <div class="controls">
+            <textarea id="server_response_headers" class="span2" rows="3"></textarea>
+          </div>
+        </div>
+
+    </div>
+
+    </form>
+  </div>
+</div>
+
+<div class="row" id="results">
+  <div class="span10">
+    <form>
+    <legend>Results</legend>
+    </form>
+  </div>
+</div>
+
+    </div>
+    <div class="span1"></div>
+  </div>
   </div>
 
-  <div id="test_server" style="display: none">
-  <table class="tblInner">
-    <tr><th colspan="2">
-      Test Server <a href="#" onclick="switchServer(); return false;">Remote Server</a>
-    </th></tr>
+  <script src="js/jquery-1.8.2.min.js"></script>
+  <script src="js/bootstrap-2.2.1.min.js"></script>
+  <script>
 
-    <tr id="div_server_enable"><td class="form_label">
-      <label for="server_enable">Enable CORS</label>
-    </td><td class="form_input">
-      <input type="checkbox" id="server_enable" checked />
-    </td></tr>
+$(function() {
+  $('#server_tabs a:first').tab('show');
+});
 
-    <tr id="div_server_httpstatus"><td class="form_label">
-      <label for="server_status">HTTP Status</label>
-    </td><td class="form_input">
-      <input type="text" id="server_httpstatus" value="200" />
-    </td></tr>
-
-    <tr id="div_server_credentials"><td class="form_label">
-      <label for="server_credentials">Allow Credentials</label>
-    </td><td class="form_input">
-      <input type="checkbox" id="server_credentials" />
-    </td></tr>
-
-    <tr id="div_server_methods"><td class="form_label">
-      <label for="server_methods">Allow Methods</label>
-    </td><td class="form_input">
-      <input type="text" id="server_methods" />
-    </td></tr>
-
-    <tr id="div_server_headers"><td class="form_label">
-      <label for="server_headers">Allow Headers</label>
-    </td><td class="form_input">
-      <input type="text" id="server_headers" />
-    </td></tr>
-
-    <tr id="div_server_expose_headers"><td class="form_label">
-      <label for="server_expose_headers">Expose Headers</label>
-    </td><td class="form_input">
-      <input type="text" id="server_expose_headers" />
-    </td></tr>
-
-    <tr id="div_server_max_age"><td class="form_label">
-      <label for="server_max_age">Max Age</label>
-    </td><td class="form_input">
-      <input type="text" id="server_max_age" />
-    </td></tr>
-
-    <tr id="div_server_response_headers"><td class="form_label">
-      <label for="server_response_headers">Response Headers</label>
-    </td><td class="form_input">
-      <textarea id="server_response_headers"></textarea>
-    </td></tr>
-
-  </table>
-  </div>
-
-</td></tr>
-
-</table>
-
-<table class="tblPage">
-<tr><th>Log</th></tr>
-<tr><td>
-  <div id="outputLog"></div>
-</td></tr>
-</table>
-
-<div id="help-menu"></div>
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-<script src="js/corsclient.js"></script>
-
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-34992572-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
-
-</body>
+  </script>
+ </body>
 </html>
