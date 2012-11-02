@@ -1,9 +1,10 @@
 application: $APPLICATION
 version: server
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: true
 
 handlers:
 - url: /server
-  script: corsserver.py
+  script: corsserver.app
 

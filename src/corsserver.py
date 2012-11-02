@@ -1,12 +1,10 @@
 import logging
 import random
+import simplejson as json
 import string
+import webapp2
 
 from google.appengine.api import memcache
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-
-from django.utils import simplejson as json
 
 
 class JsonSerializer:
@@ -83,7 +81,7 @@ class TextSerializer:
     return body  
 
 
-class CorsServer(webapp.RequestHandler):
+class CorsServer(webapp2.RequestHandler):
 
   def __isCors(self):
     return 'origin' in self.request.headers
@@ -96,7 +94,7 @@ class CorsServer(webapp.RequestHandler):
 
   def __addResponseHeaders(self, headers, response):
     for key, val in headers.items():
-      response.headers[key] = val
+      response.headers[str(key)] = str(val)
 
   def __handleCors(self, config):
     self.__addCorsHeaders(config)
@@ -105,7 +103,7 @@ class CorsServer(webapp.RequestHandler):
     if 'exposeHeaders' in config:
       exposeHeaders = config['exposeHeaders']
     if exposeHeaders:
-      self.response.headers['Access-Control-Expose-Headers'] = exposeHeaders
+      self.response.headers['Access-Control-Expose-Headers'] = str(exposeHeaders)
 
     if config['responseHeaders']:
       self.__addResponseHeaders(config['responseHeaders'], self.response)
@@ -118,11 +116,11 @@ class CorsServer(webapp.RequestHandler):
   def __handlePreflight(self, config):
     self.__addCorsHeaders(config)
     if config['methods'] != '':
-      self.response.headers['Access-Control-Allow-Methods'] = config['methods']
+      self.response.headers['Access-Control-Allow-Methods'] = str(config['methods'])
     if config['headers'] != '':
-      self.response.headers['Access-Control-Allow-Headers'] = config['headers']
+      self.response.headers['Access-Control-Allow-Headers'] = str(config['headers'])
     if config['maxAge'] > 0:
-      self.response.headers['Access-Control-Max-Age'] = config['maxAge']
+      self.response.headers['Access-Control-Max-Age'] = str(config['maxAge'])
     self.__storeBody(config, 'preflight')
 
   def __storeBody(self, config, reqType):
@@ -219,14 +217,4 @@ class CorsServer(webapp.RequestHandler):
     self.__handleRequest('PUT')
 
 
-application = webapp.WSGIApplication([('/server', CorsServer)],
-                                     debug=True)
-
-
-def main():
-  logging.getLogger().setLevel(logging.DEBUG)
-  run_wsgi_app(application)
-
-
-if __name__ == "__main__":
-  main()
+app = webapp2.WSGIApplication([('/server', CorsServer)])
