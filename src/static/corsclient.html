@@ -24,7 +24,7 @@
     <form class="form-horizontal">
     <legend>Client</legend>
 
-    <div class="control-group">
+    <div class="control-group" id="client_method_div" title="Help: HTTP Method" data-content="">
       <label class="control-label" for="client_method">HTTP Method</label>
       <div class="controls">
         <select id="client_method" class="span2">
@@ -38,14 +38,14 @@
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group" id="client_credentials_div" title="Help: With credentials?" data-content="">
       <label class="control-label" for="client_credentials">With credentials?</label>
       <div class="controls">
         <input type="checkbox" id="client_credentials" />
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group" id="client_method_div" title="Help: Request Headers" data-content="">
       <label class="control-label" for="client_headers">Request Headers</label>
       <div class="controls">
         <textarea id="client_headers" class="span2" rows="4"></textarea>
@@ -70,7 +70,7 @@
     <div class="tab-content">
       <div class="tab-pane" id="remote">
 
-        <div class="control-group">
+        <div class="control-group" id="server_url_div" title="Help: Remote URL" data-content="">
           <label class="control-label" for="server_url">Remote URL</label>
           <div class="controls">
             <input type="text" id="server_url" class="span2" />
@@ -81,56 +81,56 @@
 
       <div class="tab-pane" id="local">
 
-        <div class="control-group">
+        <div class="control-group" id="server_enable_div" title="Help: Enable CORS" data-content="">
           <label class="control-label" for="server_enable">Enable CORS</label>
           <div class="controls">
             <input type="checkbox" id="server_enable" checked />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_status_div" title="Help: HTTP Status" data-content="">
           <label class="control-label" for="server_status">HTTP Status</label>
           <div class="controls">
 <input type="text" id="server_httpstatus" value="200" class="span1" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_credentials_div" title="Help: Allow Credentials" data-content="">
           <label class="control-label" for="server_credentials">Allow Credentials</label>
           <div class="controls">
             <input type="checkbox" id="server_credentials" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_methods_div" title="Help: Allow Methods" data-content="">
           <label class="control-label" for="server_methods">Allow Methods</label>
           <div class="controls">
             <input type="text" id="server_methods" class="span2" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_headers_div" title="Help: Allow Headers" data-content="">
           <label class="control-label" for="server_headers">Allow Headers</label>
           <div class="controls">
             <input type="text" id="server_headers" class="span2" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_expose_headers_div" title="Help: Expose Headers" data-content="">
           <label class="control-label" for="server_expose_headers">Expose Headers</label>
           <div class="controls">
             <input type="text" id="server_expose_headers" class="span2" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_max_age_div" title="Help: Max Age" data-content="">
           <label class="control-label" for="server_max_age">Max Age</label>
           <div class="controls">
             <input type="text" id="server_max_age" class="span2" />
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group" id="server_response_headers_div" title="Help: Response Headers" data-content="">
           <label class="control-label" for="server_response_headers">Response Headers</label>
           <div class="controls">
             <textarea id="server_response_headers" class="span2" rows="3"></textarea>
@@ -162,6 +162,17 @@
 
 $(function() {
   $('#server_tabs a:first').tab('show');
+
+  var help_divs = $('.control-group').filter('div[id]').each(function(index) {
+    var id = $(this).attr('id');
+    var placement = 'left';
+    if (id.indexOf('server_') == 0) {
+      placement = 'right';
+    }
+    $(this).popover({
+      placement: placement,
+      trigger: 'hover'});
+  });
 });
 
   </script>
