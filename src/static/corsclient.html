@@ -54,7 +54,7 @@
 
     <div class="control-group">
     <div class="controls">
-      <button class="btn btn-large btn-primary" type="button">Send Request</button>
+      <button class="btn btn-large btn-primary" type="button" id="btnSendRequest">Send Request</button>
     </div></div>
 
     </form>
@@ -90,7 +90,7 @@
         <div class="control-group" id="server_status_div" title="Help: HTTP Status" data-content="The HTTP Status code the server should respond with. Default: 200.">
           <label class="control-label" for="server_status">HTTP Status</label>
           <div class="controls">
-<input type="text" id="server_httpstatus" value="200" class="span1" />
+<input type="text" id="server_status" value="200" class="span1" />
           </div>
         </div>
 
@@ -189,15 +189,16 @@ Query.serialize = function(queryObj) {
     if (!queryObj.hasOwnProperty(key)) {
       continue;
     }
+    var val = queryObj[key];
+    if (!val) {
+      continue;
+    }
     if (queryArray.length > 0) {
       queryArray.push('&');
     }
     queryArray.push(encodeURIComponent(key));
     queryArray.push('=');
-    var val = queryObj[key];
-    if (val) {
-      queryArray.push(encodeURIComponent(val));
-    }
+    queryArray.push(encodeURIComponent(val));
   }
   return queryArray.join('');
 };
@@ -285,7 +286,9 @@ DataItem.prototype.toForm = function() {
   if (this.isCheckbox_) {
     this.elem_.prop('checked', this.val_);
   } else {
-    this.elem_.val(this.val_);
+    if (this.val_) {
+      this.elem_.val(this.val_);
+    }
   }
 };
 
@@ -329,6 +332,27 @@ DataController.prototype.setFormFromUrl = function() {
   this.serverTabController.setFromUrl();
 };
 
+DataController.prototype.readForm = function() {
+  var that = this;
+  $.each(this.items_, function(index, value) {
+    that.items_[index].fromForm();
+  });
+};
+
+DataController.prototype.writeUrl = function() {
+  var that = this;
+  $.each(this.items_, function(index, value) {
+    that.items_[index].toUrl();
+  });
+  this.url_.write();
+};
+
+var sendRequest = function(controller) {
+  controller.readForm();
+  controller.writeUrl();
+};
+
+
 $(function() {
   var help_divs = $('.control-group').filter('div[id]').each(function() {
     var id = $(this).attr('id');
@@ -345,6 +369,10 @@ $(function() {
   $('.control-label').each(function() {
     console.log($(this).attr('for'));
     controller.addItem($(this).attr('for'));
+  });
+
+  $('#btnSendRequest').click(function() {
+    sendRequest(controller);
   });
 
   controller.setFormFromUrl();
