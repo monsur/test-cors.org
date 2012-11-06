@@ -24,7 +24,7 @@
     <form class="form-horizontal">
     <legend>Client</legend>
 
-    <div class="control-group" id="client_method_div" title="Help: HTTP Method" data-content="">
+    <div class="control-group" id="client_method_div" title="Help: HTTP Method" data-content="Which HTTP method the client should use when making the request.">
       <label class="control-label" for="client_method">HTTP Method</label>
       <div class="controls">
         <select id="client_method" class="span2">
@@ -38,14 +38,14 @@
       </div>
     </div>
 
-    <div class="control-group" id="client_credentials_div" title="Help: With credentials?" data-content="">
+    <div class="control-group" id="client_credentials_div" title="Help: With credentials?" data-content="Whether the client should include cookies in the request.">
       <label class="control-label" for="client_credentials">With credentials?</label>
       <div class="controls">
         <input type="checkbox" id="client_credentials" />
       </div>
     </div>
 
-    <div class="control-group" id="client_method_div" title="Help: Request Headers" data-content="">
+    <div class="control-group" id="client_method_div" title="Help: Request Headers" data-content="A list of custom request headers to include in the request. One header per line, in the format key: value.">
       <label class="control-label" for="client_headers">Request Headers</label>
       <div class="controls">
         <textarea id="client_headers" class="span2" rows="4"></textarea>
@@ -63,74 +63,73 @@
     <form class="form-horizontal">
     <legend>Server</legend>
     <ul class="nav nav-tabs" id="server_tabs">
-      <li><a href="#remote" data-toggle="tab">Remote</a></li>
-      <li><a href="#local" data-toggle="tab">Local</a></li>
+      <li><a href="#tabremote" data-toggle="tab" id="remote">Remote</a></li>
+      <li><a href="#tablocal" data-toggle="tab" id="local">Local</a></li>
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane" id="remote">
+      <div class="tab-pane" id="tabremote">
 
-        <div class="control-group" id="server_url_div" title="Help: Remote URL" data-content="">
+        <div class="control-group" id="server_url_div" title="Help: Remote URL" data-content="The URL to test for CORS support.">
           <label class="control-label" for="server_url">Remote URL</label>
           <div class="controls">
             <input type="text" id="server_url" class="span2" />
           </div>
         </div>
-        
       </div>
 
-      <div class="tab-pane" id="local">
+      <div class="tab-pane" id="tablocal">
 
-        <div class="control-group" id="server_enable_div" title="Help: Enable CORS" data-content="">
+        <div class="control-group" id="server_enable_div" title="Help: Enable CORS" data-content="Whether or not the server should allow CORS requests.">
           <label class="control-label" for="server_enable">Enable CORS</label>
           <div class="controls">
             <input type="checkbox" id="server_enable" checked />
           </div>
         </div>
 
-        <div class="control-group" id="server_status_div" title="Help: HTTP Status" data-content="">
+        <div class="control-group" id="server_status_div" title="Help: HTTP Status" data-content="The HTTP Status code the server should respond with. Default: 200.">
           <label class="control-label" for="server_status">HTTP Status</label>
           <div class="controls">
 <input type="text" id="server_httpstatus" value="200" class="span1" />
           </div>
         </div>
 
-        <div class="control-group" id="server_credentials_div" title="Help: Allow Credentials" data-content="">
+        <div class="control-group" id="server_credentials_div" title="Help: Allow Credentials" data-content="Whether the server should allow cookies on the request.">
           <label class="control-label" for="server_credentials">Allow Credentials</label>
           <div class="controls">
             <input type="checkbox" id="server_credentials" />
           </div>
         </div>
 
-        <div class="control-group" id="server_methods_div" title="Help: Allow Methods" data-content="">
+        <div class="control-group" id="server_methods_div" title="Help: Allow Methods" data-content="Comma-delimited list of HTTP methods the server should allow.">
           <label class="control-label" for="server_methods">Allow Methods</label>
           <div class="controls">
             <input type="text" id="server_methods" class="span2" />
           </div>
         </div>
 
-        <div class="control-group" id="server_headers_div" title="Help: Allow Headers" data-content="">
+        <div class="control-group" id="server_headers_div" title="Help: Allow Headers" data-content="Comma-delimited list of HTTP headers the server should allow.">
           <label class="control-label" for="server_headers">Allow Headers</label>
           <div class="controls">
             <input type="text" id="server_headers" class="span2" />
           </div>
         </div>
 
-        <div class="control-group" id="server_expose_headers_div" title="Help: Expose Headers" data-content="">
+        <div class="control-group" id="server_expose_headers_div" title="Help: Expose Headers" data-content="Comma-delimited list of HTTP response headers that the client should be able to view.">
           <label class="control-label" for="server_expose_headers">Expose Headers</label>
           <div class="controls">
             <input type="text" id="server_expose_headers" class="span2" />
           </div>
         </div>
 
-        <div class="control-group" id="server_max_age_div" title="Help: Max Age" data-content="">
+        <div class="control-group" id="server_max_age_div" title="Help: Max Age" data-content="The time, in seconds, that the preflight response should be cached for.">
           <label class="control-label" for="server_max_age">Max Age</label>
           <div class="controls">
             <input type="text" id="server_max_age" class="span2" />
           </div>
         </div>
 
-        <div class="control-group" id="server_response_headers_div" title="Help: Response Headers" data-content="">
+        <div class="control-group" id="server_response_headers_div" title="Help: Response Headers" data-content="Custom headers to include in the server response.">
           <label class="control-label" for="server_response_headers">Response Headers</label>
           <div class="controls">
             <textarea id="server_response_headers" class="span2" rows="3"></textarea>
@@ -160,10 +159,178 @@
   <script src="js/bootstrap-2.2.1.min.js"></script>
   <script>
 
-$(function() {
-  $('#server_tabs a:first').tab('show');
+var Query = {};
 
-  var help_divs = $('.control-group').filter('div[id]').each(function(index) {
+Query.parse = function(query) {
+  var queryObj = {};
+
+  if (!query) {
+    return queryObj;
+  }
+
+  pairs = query.split('&');
+  for (var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i];
+    parts = pair.split('=');
+    if (parts.length != 2) {
+      continue;
+    }
+    var key = decodeURIComponent(parts[0]);
+    var val = decodeURIComponent(parts[1]) || null;
+    queryObj[key] = val;
+  }
+
+  return queryObj;
+};
+
+Query.serialize = function(queryObj) {
+  var queryArray = [];
+  for (var key in queryObj) {
+    if (!queryObj.hasOwnProperty(key)) {
+      continue;
+    }
+    if (queryArray.length > 0) {
+      queryArray.push('&');
+    }
+    queryArray.push(encodeURIComponent(key));
+    queryArray.push('=');
+    var val = queryObj[key];
+    if (val) {
+      queryArray.push(encodeURIComponent(val));
+    }
+  }
+  return queryArray.join('');
+};
+
+
+var Url = function() {
+  this.query_ = {};
+};
+
+Url.PREFIX_ = '#?';
+
+Url.prototype.read = function(opt_hash) {
+  this.query_ = {};
+  var hash = opt_hash || window.location.hash;
+  if (!hash) {
+    return;
+  }
+
+  if (hash.indexOf(Url.PREFIX_) === 0) {
+    hash = hash.substring(2);
+  }
+  if (!hash) {
+    return;
+  }
+
+  this.query_ = Query.parse(hash);
+};
+
+Url.prototype.write = function() {
+  var hash = Query.serialize(this.query_);
+  window.location.hash = Url.PREFIX_ + hash;
+};
+
+Url.prototype.get = function(key) {
+  return this.query_[key];
+};
+
+Url.prototype.set = function(key, val) {
+  this.query_[key] = val;
+};
+
+Url.prototype.each = function(func) {
+  for (var key in this.query_) {
+    if (!this.query_.hasOwnProperty(key)) {
+      continue;
+    }
+    var val = this.query_[key];
+    func.call(null, key, val);
+  }
+};
+
+var DataItem = function(id, url) {
+  this.id_ = id;
+  this.elem_ = $('#' + id);
+  this.isCheckbox_ = (this.elem_.attr('type') === 'checkbox');
+  this.val_ = null;
+  this.url_ = url;
+};
+
+DataItem.prototype.get = function() {
+  return this.val_;
+}
+
+DataItem.prototype.set = function(val) {
+  this.val_ = val;
+};
+
+DataItem.prototype.fromUrl = function() {
+  this.val_ = this.url_.get(this.id_);
+};
+
+DataItem.prototype.toUrl = function() {
+  this.url_.set(this.id_, this.val_);
+};
+
+DataItem.prototype.fromForm = function() {
+  if (this.isCheckbox_) {
+    this.val_ = this.elem_.is(':checked');
+  } else {
+    this.val_ = this.elem_.val();
+  }
+};
+
+DataItem.prototype.toForm = function() {
+  if (this.isCheckbox_) {
+    this.elem_.prop('checked', this.val_);
+  } else {
+    this.elem_.val(this.val_);
+  }
+};
+
+
+var ServerTabController = function(url) {
+  this.url_ = url;
+};
+
+ServerTabController.KEY_ = 'server_tab';
+
+ServerTabController.prototype.setFromUrl = function() {
+  var selected = this.url_.get(ServerTabController.KEY_) || 'remote';
+  $('#' + selected).tab('show');
+};
+
+ServerTabController.prototype.setToUrl = function() {
+  var val = $('#server_tabs').filter('.active').attr('id');
+  this.url_.set(ServerTabController.KEY_, val);
+};
+
+
+var DataController = function() {
+  this.url_ = new Url();
+  this.url_.read();
+  this.items_ = [];
+  this.serverTabController = new ServerTabController(this.url_);
+};
+
+DataController.prototype.addItem = function(id) {
+  this.items_.push(new DataItem(id, this.url_));
+}
+
+DataController.prototype.setFormFromUrl = function() {
+  var that = this;
+  $.each(this.items_, function(index, value) {
+    that.items_[index].fromUrl();
+  });
+  $.each(this.items_, function(index, value) {
+    that.items_[index].toForm();
+  });
+  this.serverTabController.setFromUrl();
+};
+
+$(function() {
+  var help_divs = $('.control-group').filter('div[id]').each(function() {
     var id = $(this).attr('id');
     var placement = 'left';
     if (id.indexOf('server_') == 0) {
@@ -173,6 +340,14 @@ $(function() {
       placement: placement,
       trigger: 'hover'});
   });
+
+  var controller = new DataController();
+  $('.control-label').each(function() {
+    console.log($(this).attr('for'));
+    controller.addItem($(this).attr('for'));
+  });
+
+  controller.setFormFromUrl();
 });
 
   </script>
