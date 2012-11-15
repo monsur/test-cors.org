@@ -52,15 +52,20 @@ Logger.prototype.logXhr = function(xhr) {
 
   var text = xhr.responseText;
   if (text) {
-    var response = JSON.parse(text);
-    this.log('');
-    for (var i = 0; i < response.length; i++) {
-      var r = response[i];
-      if (r['requestType'] == 'preflight') {
-        this.logPreflight(r);
-      } else {
-        this.logCors(r);
+    try {
+      var response = JSON.parse(text);
+      this.log('');
+      for (var i = 0; i < response.length; i++) {
+        var r = response[i];
+        if (r['requestType'] == 'preflight') {
+          this.logPreflight(r);
+        } else {
+          this.logCors(r);
+        }
       }
+    } catch (e) {
+      // Response was not JSON
+      // Don't log the body.
     }
   }
 }
