@@ -1,5 +1,111 @@
 var SERVER_URL = '$SERVER/server';
 
+/**
+ * @constructor
+ */
+var Logger = function(opt_destinationId) {
+  this.destinationId = '#' + (opt_destinationId || 'outputLog');
+};
+
+Logger.prototype.log = function(msg) {
+  msg = msg + '<br>';
+  if (this.inCode) {
+    this.buffer.push(msg);
+  } else {
+    $(this.destinationId).append(msg);
+  }
+};
+
+Logger.prototype.startCode = function() {
+  this.buffer = [];
+  this.inCode = true;
+};
+
+Logger.prototype.endCode = function() {
+  var msg = this.buffer.join('\r\n');
+  msg = '<code>' + msg + '</code>';
+  this.buffer = null;
+  this.inCode = false;
+  this.log(msg);
+};
+
+Logger.prototype.clear = function() {
+  $(this.destinationId).empty();
+};
+
+Logger.prototype.logEvent = function(msg, opt_color) {
+  var color = opt_color || 'yellow';
+  this.log('Fired XHR event: <span class="log-' + color + '">' + msg + '</span>');
+}
+
+Logger.prototype.logXhr = function(xhr) {
+  this.log('<br>XHR status: ' + xhr.status);
+  if ('statusText' in xhr) {
+    // Firefox doesn't allow access to statusText when there's an error.
+    this.log('XHR status text: ' + xhr.statusText);
+  }
+
+  var headers = xhr.getAllResponseHeaders();
+  if (headers) {
+    this.log('XHR exposed response headers: <pre class="headers">' + headers + '</pre>');
+  }
+
+  var text = xhr.responseText;
+  if (text) {
+    var response = JSON.parse(text);
+    this.log('');
+    for (var i = 0; i < response.length; i++) {
+      var r = response[i];
+      if (r['requestType'] == 'preflight') {
+        this.logPreflight(r);
+      } else {
+        this.logCors(r);
+      }
+    }
+  }
+}
+
+Logger.prototype.logHttp = function(label, r) {
+  this.log(label);
+  this.startCode();
+ 
+  var msg = '';
+  if (r['httpMethod']) {
+    msg += r['httpMethod'] + ' ';
+  }
+  if (r['url']) {
+    msg += r['url'];
+  }
+  if (msg.length > 0) {
+    this.log(msg);
+  }
+
+  var headers = r['headers'];
+  if (headers) {
+    for (var name in headers) {
+      if (!headers.hasOwnProperty(name)) {
+        continue;
+      }
+      this.log(name + ': ' + headers[name]);
+    }
+  }
+
+  this.endCode();
+  this.log('');
+}
+
+Logger.prototype.logPreflight = function(r) {
+  this.logHttp('Preflight Request', r['request']);
+  this.logHttp('Preflight Response', r['response']);
+}
+
+Logger.prototype.logCors = function(r) {
+  this.logHttp('CORS Request', r['request']);
+  this.logHttp('CORS Response', r['response']);
+}
+
+var logger = new Logger();
+
 var Query = {};
 
 Query.parse = function(query) {
@@ -31,7 +137,7 @@ Query.serialize = function(queryObj) {
       continue;
     }
     var val = queryObj[key];
-    if (!val) {
+    if (val === null || val === undefined || val === '') {
       continue;
     }
     if (queryArray.length > 0) {
@@ -262,6 +368,8 @@ var parseHeaders = function(headerStr) {
 }
 
 var sendRequest = function(controller, url) {
+  logger.clear();
+
   controller.each(function(index, value) {
     value.fromUi();
   });
@@ -269,19 +377,64 @@ var sendRequest = function(controller, url) {
     value.toUrl();
   });
   url.write();
-
+  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + window.location.href + '\');return false;">Link to this test</a>');
+ 
   var httpMethod = controller.getValue('client_method');
   var serverUrl = getServerUrl(controller);
   var xhr = createCORSRequest(httpMethod, serverUrl);
+  var msg = 'Sending ' + httpMethod + ' request to ' +
+      '<code>' + serverUrl + '</code><br>';
 
   if (controller.getValue('client_credentials')) {
     xhr.withCredentials = true;
+    msg += ', with credentials';
   }
 
+  var headersMsg = '';
   var requestHeaders = parseHeaders(controller.getValue('client_headers'));
   $.each(requestHeaders, function(key, val) {
     xhr.setRequestHeader(key, val);
+    if (headersMsg.length == 0) {
+      headersMsg = ', with custom headers';
+    }
   });
+  msg += headersMsg;
+
+  xhr.onreadystatechange = function() {
+    logger.logEvent('readystatechange');
+  };
+
+  xhr.onloadstart = function() {
+    logger.logEvent('loadstart');
+  };
+
+  xhr.onprogress = function() {
+    logger.logEvent('progress');
+  };
+
+  xhr.onabort = function() {
+    logger.logEvent('abort', 'red');
+  };
+
+  xhr.onerror = function() {
+    logger.logEvent('error', 'red');
+    logger.logXhr(xhr);
+  };
+
+  xhr.onload = function() {
+    logger.logEvent('load', 'green');
+    logger.logXhr(xhr);
+  };
+
+  xhr.ontimeout = function() {
+    logger.logEvent('timeout', 'red');
+  };
+
+  xhr.onloadend = function() {
+    logger.logEvent('loadend');
+  };
+
+  logger.log(msg);
 
   xhr.send();
 };
