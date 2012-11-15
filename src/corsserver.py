@@ -155,24 +155,27 @@ class CorsServer(webapp2.RequestHandler):
 
   def __getConfig(self, httpMethod):
     config = {}
-    config['enable'] = self.request.get('enable', True)
+    enable = False
+    if self.request.get('enable') == 'true':
+      enable = True
+    config['enable'] = enable
     if self.request.get('credentials') == 'true':
       config['credentials'] = True
     config['httpMethod'] = httpMethod
     config['methods'] = self.request.get('methods')
     config['headers'] = self.request.get('headers')
-    config['exposeHeaders'] = self.request.get('exposeHeaders')
+    config['exposeHeaders'] = self.request.get('expose_headers')
     config['id'] = self.request.get('id')
-    config['responseHeaders'] = self.__parseHeaders(self.request.get('responseHeaders'))
+    config['responseHeaders'] = self.__parseHeaders(self.request.get('response_headers'))
 
     maxAge = -1
     try:
-      maxAge = int(self.request.get('maxAge'))
+      maxAge = int(self.request.get('max_age'))
     except:
       maxAge = -1
     config['maxAge'] = maxAge
 
-    httpstatus = self.request.get('httpstatus')
+    httpstatus = self.request.get('status')
     if httpstatus:
       config['httpstatus'] = int(httpstatus)
 
