@@ -247,12 +247,22 @@ var CheckboxField = function() {
 };
 CheckboxField.prototype = new Field;
 
+CheckboxField.prototype.fromUrl = function() {
+  var val = this.url_.get(this.id_);
+  if (val !== null && typeof val !== 'undefined') {
+    val = (val === 'true');
+  }
+  this.val_ = val;
+};
+
 CheckboxField.prototype.fromUi = function() {
   this.val_ = $('#' + this.id_).is(':checked');
 };
 
 CheckboxField.prototype.toUi = function() {
-  $('#' + this.id_).prop('checked', this.val_);
+  if (this.val_ !== null) {
+    $('#' + this.id_).prop('checked', this.val_);
+  }
 };
 
 
