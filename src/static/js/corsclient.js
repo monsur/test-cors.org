@@ -42,12 +42,12 @@ Logger.prototype.logXhr = function(xhr) {
   this.log('<br>XHR status: ' + xhr.status);
   if ('statusText' in xhr) {
     // Firefox doesn't allow access to statusText when there's an error.
-    this.log('XHR status text: ' + xhr.statusText);
+    this.log('XHR status text: ' + htmlEscape(xhr.statusText));
   }
 
   var headers = xhr.getAllResponseHeaders();
   if (headers) {
-    this.log('XHR exposed response headers: <pre class="headers">' + headers + '</pre>');
+    this.log('XHR exposed response headers: <pre class="headers">' + htmlEscape(headers) + '</pre>');
   }
 
   var text = xhr.responseText;
@@ -66,15 +66,15 @@ Logger.prototype.logXhr = function(xhr) {
 }
 
 Logger.prototype.logHttp = function(label, r) {
-  this.log(label);
+  this.log(htmlEscape(label));
   this.startCode();
  
   var msg = '';
   if (r['httpMethod']) {
-    msg += r['httpMethod'] + ' ';
+    msg += htmlEscape(r['httpMethod']) + ' ';
   }
   if (r['url']) {
-    msg += r['url'];
+    msg += htmlEscape(r['url']);
   }
   if (msg.length > 0) {
     this.log(msg);
@@ -86,7 +86,7 @@ Logger.prototype.logHttp = function(label, r) {
       if (!headers.hasOwnProperty(name)) {
         continue;
       }
-      this.log(name + ': ' + headers[name]);
+      this.log(htmlEscape(name) + ': ' + htmlEscape(headers[name]));
     }
   }
 
@@ -288,6 +288,9 @@ FieldsController.prototype.getValue = function(id) {
   return this.items_[id].get();
 };
 
+var htmlEscape = function(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
 
 var setFormFromUrl = function(controller) {
   controller.each(function(index, value) {
@@ -377,13 +380,13 @@ var sendRequest = function(controller, url) {
     value.toUrl();
   });
   url.write();
-  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + window.location.href + '\');return false;">Link to this test</a>');
+  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + htmlEscape(window.location.href) + '\');return false;">Link to this test</a>');
  
   var httpMethod = controller.getValue('client_method');
   var serverUrl = getServerUrl(controller);
   var xhr = createCORSRequest(httpMethod, serverUrl);
-  var msg = 'Sending ' + httpMethod + ' request to ' +
-      '<code>' + serverUrl + '</code><br>';
+  var msg = 'Sending ' + htmlEscape(httpMethod) + ' request to ' +
+      '<code>' + htmlEscape(serverUrl) + '</code><br>';
 
   if (controller.getValue('client_credentials')) {
     xhr.withCredentials = true;
@@ -395,8 +398,11 @@ var sendRequest = function(controller, url) {
   $.each(requestHeaders, function(key, val) {
     xhr.setRequestHeader(key, val);
     if (headersMsg.length == 0) {
-      headersMsg = ', with custom headers';
+      headersMsg = ', with custom headers: ';
+    } else {
+      headersMsg += ', ';
     }
+    headersMsg += htmlEscape(key);
   });
   msg += headersMsg;
 
