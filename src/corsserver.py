@@ -1,6 +1,6 @@
 import logging
 import random
-import simplejson as json
+import json
 import string
 import webapp2
 
