@@ -47,8 +47,8 @@ Logger.prototype.startCode = function() {
 };
 
 Logger.prototype.endCode = function() {
-  var msg = this.buffer_.join('\r\n');
-  msg = '<code>' + msg + '</code>';
+  var msg = this.buffer_.join('');
+  msg = '<pre>' + msg + '</pre>';
   this.buffer_ = null;
   this.inCode_ = false;
   this.log(msg);
@@ -537,7 +537,7 @@ var sendRequest = function(controller, url) {
   url.write();
 
   // Link to this test.
-  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + htmlEscape(window.location.href) + '\');return false;">Link to this test</a>');
+  logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + htmlEscape(window.location.href) + '\');return false;">Link to this test</a><br>');
 
   // Create the XHR object and make the request.
   var httpMethod = controller.getValue('client_method');
