@@ -1,41 +1,67 @@
+(function(window, undefined) {
+
+/**
+ * The url to send the request to
+ * (if using "local" mode).
+ */
 var SERVER_URL = '$SERVER/server';
 
 /**
- * @constructor
+ * The prefix to identify server fields.
  */
-var Logger = function(opt_destinationId) {
-  this.destinationId = '#' + (opt_destinationId || 'outputLog');
+var SERVER_PREFIX_ = 'server_';
+
+
+/**
+ * Helper function to html escape a string.
+ */
+var htmlEscape = function(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
+
+/**
+ * Logs status messages to the results log section of the page.
+ * @constructor
+ */
+var Logger = function(opt_id) {
+  this.elem_ = $('#' + (opt_id || 'outputLog'));
+};
+
+/**
+ * Log a status message to the results log.
+ * Does not HTML escape the message.
+ */
 Logger.prototype.log = function(msg) {
   msg = msg + '<br>';
-  if (this.inCode) {
-    this.buffer.push(msg);
+  if (this.inCode_) {
+    this.buffer_.push(msg);
   } else {
-    $(this.destinationId).append(msg);
+    this.elem_.append(msg);
   }
 };
 
 Logger.prototype.startCode = function() {
-  this.buffer = [];
-  this.inCode = true;
+  this.buffer_ = [];
+  this.inCode_ = true;
 };
 
 Logger.prototype.endCode = function() {
-  var msg = this.buffer.join('\r\n');
+  var msg = this.buffer_.join('\r\n');
   msg = '<code>' + msg + '</code>';
-  this.buffer = null;
-  this.inCode = false;
+  this.buffer_ = null;
+  this.inCode_ = false;
   this.log(msg);
 };
 
 Logger.prototype.clear = function() {
-  $(this.destinationId).empty();
+  this.elem_.empty();
 };
 
 Logger.prototype.logEvent = function(msg, opt_color) {
   var color = opt_color || 'yellow';
-  this.log('Fired XHR event: <span class="log-' + color + '">' + msg + '</span>');
+  this.log(
+      'Fired XHR event: <span class="log-' + color + '">' + msg + '</span>');
 }
 
 Logger.prototype.logXhr = function(xhr) {
@@ -47,12 +73,16 @@ Logger.prototype.logXhr = function(xhr) {
 
   var headers = xhr.getAllResponseHeaders();
   if (headers) {
-    this.log('XHR exposed response headers: <pre class="headers">' + htmlEscape(headers) + '</pre>');
+    this.log('XHR exposed response headers: ' +
+        '<pre class="headers">' + htmlEscape(headers) + '</pre>');
   }
 
   var text = xhr.responseText;
   if (text) {
     try {
+      // Log the details of the body.
+      // If this is a request to the local test server, the response body will
+      // be a JSON object containing the request and response HTTP details.
       var response = JSON.parse(text);
       this.log('');
       for (var i = 0; i < response.length; i++) {
@@ -73,7 +103,7 @@ Logger.prototype.logXhr = function(xhr) {
 Logger.prototype.logHttp = function(label, r) {
   this.log(htmlEscape(label));
   this.startCode();
- 
+
   var msg = '';
   if (r['httpMethod']) {
     msg += htmlEscape(r['httpMethod']) + ' ';
@@ -111,8 +141,16 @@ Logger.prototype.logCors = function(r) {
 
 var logger = new Logger();
 
+
+/**
+ * Helper functions to parse key/value pairs in a query string.
+ */
 var Query = {};
 
+/**
+ * Parses the values of the query string into an object.
+ * e.g. a=1&b=2 => {a: '1', b: '2'}
+ */
 Query.parse = function(query) {
   var queryObj = {};
 
@@ -135,16 +173,25 @@ Query.parse = function(query) {
   return queryObj;
 };
 
+/**
+ * Serializes an object to a query string.
+ * e.g. {a: '1', b: '2'} => a=1&b=2
+ */
 Query.serialize = function(queryObj) {
   var queryArray = [];
   for (var key in queryObj) {
     if (!queryObj.hasOwnProperty(key)) {
       continue;
     }
+
     var val = queryObj[key];
     if (val === null || val === undefined || val === '') {
+      // Skip the value if it does not exist.
+      // Note that boolean 'false' is considered significant and will be
+      // preserved.
       continue;
     }
+
     if (queryArray.length > 0) {
       queryArray.push('&');
     }
@@ -152,16 +199,23 @@ Query.serialize = function(queryObj) {
     queryArray.push('=');
     queryArray.push(encodeURIComponent(val));
   }
+
   return queryArray.join('');
 };
 
 
+/**
+ * Reads/Writes data values from the url.
+ */
 var Url = function() {
   this.query_ = {};
 };
 
 Url.PREFIX_ = '#?';
 
+/**
+ * Read the data from the url hash.
+ */
 Url.prototype.read = function(opt_hash) {
   this.query_ = {};
   var hash = opt_hash || window.location.hash;
@@ -179,8 +233,12 @@ Url.prototype.read = function(opt_hash) {
   this.query_ = Query.parse(hash);
 };
 
+/**
+ * Write the data back to the url.
+ */
 Url.prototype.write = function() {
   var hash = Query.serialize(this.query_);
+  // TODO: Use history API here.
   window.location.hash = Url.PREFIX_ + hash;
 };
 
@@ -198,12 +256,19 @@ Url.prototype.each = function(func) {
       continue;
     }
     var val = this.query_[key];
-    func.call(null, key, val);
+    func.call(window, key, val);
   }
 };
 
+
+/**
+ * Represents a single field on the page.
+ * A field contains data from the UI (like a text field or a checkbox) that is
+ * used by the app and is preserved in the url.
+ */
 var Field = function(id, url) {
   this.id_ = id;
+  this.elem_ = $('#' + id);
   this.url_ = url;
   this.val_ = null;
 };
@@ -229,6 +294,9 @@ Field.prototype.toUrl = function() {
 };
 
 
+/**
+ * A form text box.
+ */
 var TextField = function() {
   this.base_ = Field;
   this.base_.apply(this, arguments);
@@ -236,16 +304,21 @@ var TextField = function() {
 TextField.prototype = new Field;
 
 TextField.prototype.fromUi = function() {
-  this.val_ = $('#' + this.id_).val();
+  this.val_ = this.elem_.val();
 };
 
 TextField.prototype.toUi = function() {
   if (this.val_) {
-    $('#' + this.id_).val(this.val_);
+    // Only set the value if it exists.
+    // This preserves any default value in the field.
+    this.elem_.val(this.val_);
   }
 };
 
 
+/**
+ * A form checkbox field.
+ */
 var CheckboxField = function() {
   this.base_ = Field;
   this.base_.apply(this, arguments);
@@ -255,22 +328,27 @@ CheckboxField.prototype = new Field;
 CheckboxField.prototype.fromUrl = function() {
   var val = this.url_.get(this.id_);
   if (val !== null && typeof val !== 'undefined') {
+    // Only set the value if it exists in the query string
+    // Otherwise the default value from the HTML is used.
     val = (val === 'true');
   }
   this.val_ = val;
 };
 
 CheckboxField.prototype.fromUi = function() {
-  this.val_ = $('#' + this.id_).is(':checked');
+  this.val_ = this.elem_.is(':checked');
 };
 
 CheckboxField.prototype.toUi = function() {
   if (this.val_ !== null) {
-    $('#' + this.id_).prop('checked', this.val_);
+    this.elem_.prop('checked', this.val_);
   }
 };
 
 
+/**
+ * A Bootstrap tab bar.
+ */
 var TabField = function() {
   this.base_ = Field;
   this.base_.apply(this, arguments);
@@ -278,15 +356,20 @@ var TabField = function() {
 TabField.prototype = new Field;
 
 TabField.prototype.fromUi = function() {
-  this.val_ = $('#' + this.id_).children().filter('.active').children().attr('id');
+  // The value is the id of the alink inside the selected item's li.
+  this.val_ = this.elem_.children().filter('.active').children().attr('id');
 };
 
 TabField.prototype.toUi = function() {
+  // Default value of this field is 'remote'.
   this.val_ = this.val_ || 'remote';
   $('#' + this.val_).tab('show');
 };
 
 
+/**
+ * Manages all the fields on this page.
+ */
 var FieldsController = function() {
   this.items_ = {};
 };
@@ -303,19 +386,12 @@ FieldsController.prototype.getValue = function(id) {
   return this.items_[id].get();
 };
 
-var htmlEscape = function(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-};
 
-var setFormFromUrl = function(controller) {
-  controller.each(function(index, value) {
-    value.fromUrl();
-  });
-  controller.each(function(index, value) {
-    value.toUi();
-  });
-};
-
+/**
+ * Retrieve a unique ID to bust the preflight cache
+ * (Or used the fixed 'preflightcache' value if we want to honor the preflight
+ * cache).
+ */
 var getId = function(controller) {
   // If maxAge has a value, it means we want the preflight response to be
   // cached. However, preflights are cached by request url. In order for
@@ -326,9 +402,13 @@ var getId = function(controller) {
   return Math.floor(Math.random()*10000000);
 };
 
-var SERVER_PREFIX_ = 'server_';
+
+/**
+ * Retrieve the url to make the request to.
+ */
 var getServerUrl = function(controller) {
   if (controller.getValue('server_tabs') == 'remote') {
+    // If running in "remote" mode, use the url supplied by the user.
     return controller.getValue('server_url');
   }
 
@@ -340,41 +420,54 @@ var getServerUrl = function(controller) {
     var id = value.getId();
     if (id.indexOf(SERVER_PREFIX_) === 0) {
       if (id === 'server_tabs' || id === 'server_url') {
+        // Skip any server fields that aren't used by the local server.
         return;
       }
       queryObj[value.getId().substring(SERVER_PREFIX_.length)] = value.get();
     }
   });
-  var query = Query.serialize(queryObj);
-  return SERVER_URL + '?' + query;
+
+  return SERVER_URL + '?' + Query.serialize(queryObj);
 };
 
-var supportsCORS = function() {
-  return !!((window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest()) ||
-    (window.XDomainRequest));
-};
 
+/**
+ * Returns a new XMLHttpRequest object (or null if CORS is not supported).
+ */
 var createCORSRequest = function(method, url) {
   var xhr = new XMLHttpRequest();
   if ("withCredentials" in xhr) {
+    // Most browsers.
     xhr.open(method, url, true);
-  } else if (typeof XDomainRequest != "undefined"){
+  } else if (typeof XDomainRequest != "undefined") {
+    // IE8 & IE9
     xhr = new XDomainRequest();
     xhr.open(method, url);
   } else {
+    // CORS not supported.
     xhr = null;
   }
   return xhr;
 };
 
+
+/**
+ * Parses a text blob representing a set of HTTP headers. Expected format:
+ * HeaderName1: HeaderValue1\r\n
+ * HeaderName2: HeaderValue2\r\n
+ */
 var parseHeaders = function(headerStr) {
   var headers = {};
+
   if (!headerStr) {
     return headers;
   }
+
   var headerPairs = headerStr.split('\n');
   for (var i = 0; i < headerPairs.length; i++) {
     var headerPair = headerPairs[i];
+    // Can't use split() here because it does the wrong thing
+    // if the header value has the string ": " in it.
     var index = headerPair.indexOf(': ');
     if (index > 0) {
       var key = $.trim(headerPair.substring(0, index));
@@ -382,21 +475,29 @@ var parseHeaders = function(headerStr) {
       headers[key] = val;
     }
   }
+
   return headers;
 }
 
+
+/**
+ * Sends the CORS request to the server, and logs key events.
+ */
 var sendRequest = function(controller, url) {
+  // Clear the log for a new run.
   logger.clear();
 
+  // Load the value from the form and write them to the url.
   controller.each(function(index, value) {
     value.fromUi();
-  });
-  controller.each(function(index, value) {
     value.toUrl();
   });
   url.write();
+
+  // Link to this test.
   logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + htmlEscape(window.location.href) + '\');return false;">Link to this test</a>');
- 
+
+  // Create the XHR object and make the request.
   var httpMethod = controller.getValue('client_method');
   var serverUrl = getServerUrl(controller);
   var xhr = createCORSRequest(httpMethod, serverUrl);
@@ -462,6 +563,8 @@ var sendRequest = function(controller, url) {
 
 
 $(function() {
+
+  // Set up the help menus.
   var help_divs = $('.control-group').filter('div[id]').each(function() {
     var id = $(this).attr('id');
     var placement = 'left';
@@ -473,9 +576,11 @@ $(function() {
       trigger: 'hover'});
   });
 
+  // Set up the shared url object.
   var url = new Url();
   url.read();
 
+  // Initialize the fields.
   var controller = new FieldsController();
   $('.control-label').each(function() {
     var id = $(this).attr('for');
@@ -487,14 +592,18 @@ $(function() {
     }
     controller.add(field);
   });
-
   controller.add(new TabField('server_tabs', url));
 
+  // Wire up an event handler on the button.
   $('#btnSendRequest').click(function() {
     sendRequest(controller, url);
   });
 
-  setFormFromUrl(controller);
+  // Read the values from the url and write it to the UI.
+  controller.each(function(index, value) {
+    value.fromUrl();
+    value.toUi();
+  });
 });
 
-
+})(window);
