@@ -145,11 +145,52 @@
 
 <div class="row" id="results">
   <div class="span10">
-    <form>
-    <legend>Results</legend>
-    </form>
+    <ul class="nav nav-tabs" id="result_tabs">
+      <li><a href="#tabresultlog" data-toggle="tab">Results</a></li>
+      <li><a href="#tabresultcode" data-toggle="tab">Code</a></li>
+    </ul>
 
-    <div id="outputLog"></div>
+    <div class="tab-content">
+      <div class="tab-pane" id="tabresultlog">
+      </div>
+
+      <div class="tab-pane" id="tabresultcode">
+
+<pre>
+var createCORSRequest = function(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // Most browsers.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // IE8 &amp; IE9
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+};
+
+var url = '<span id="code_url"></span>';
+var method = '<span id="code_method"></span>';
+var xhr = createCORSRequest(method, url);
+
+xhr.onload = function() {
+  // Success code goes here.
+};
+
+xhr.onerror = function() {
+  // Error code goes here.
+};
+<span id="code_extras"></span>
+xhr.send();
+</pre>
+
+      </div>
+    </div>
+
   </div>
 </div>
 

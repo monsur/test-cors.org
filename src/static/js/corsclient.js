@@ -25,7 +25,7 @@ var htmlEscape = function(str) {
  * @constructor
  */
 var Logger = function(opt_id) {
-  this.elem_ = $('#' + (opt_id || 'outputLog'));
+  this.elem_ = $('#' + (opt_id || 'tabresultlog'));
 };
 
 /**
@@ -54,7 +54,7 @@ Logger.prototype.endCode = function() {
   this.log(msg);
 };
 
-Logger.prototype.clear = function() {
+Logger.prototype.reset = function() {
   this.elem_.empty();
 };
 
@@ -140,6 +140,47 @@ Logger.prototype.logCors = function(r) {
 }
 
 var logger = new Logger();
+
+
+/**
+ * Like a logger, but for the code section.
+ */
+var Codder = function() {
+};
+
+Codder.prototype.setUrl = function(url) {
+  $('#code_url').text(url);
+};
+
+Codder.prototype.setMethod = function(method) {
+  $('#code_method').text(method);
+};
+
+Codder.prototype.addExtra = function(code) {
+  if ($('#code_extras').children().length === 0) {
+    code = '\r\n' + code;
+  }
+  $('#code_extras').append(code);
+};
+
+Codder.prototype.setCredentials = function() {
+  this.addExtra('xhr.withCredentials = true;');
+};
+
+Codder.prototype.addHeader = function(key, value) {
+  this.addExtra('xhr.setRequestHeader(\'' + htmlEscape(key) + '\', \'' + htmlEscape(value) + '\');');
+};
+
+/**
+ * Reset the code section by clearing out the variables.
+ */
+Codder.prototype.reset = function() {
+  $('#code_url').empty();
+  $('#code_method').empty();
+  $('#code_extras').empty();
+};
+
+var codder = new Codder();
 
 
 /**
@@ -484,8 +525,9 @@ var parseHeaders = function(headerStr) {
  * Sends the CORS request to the server, and logs key events.
  */
 var sendRequest = function(controller, url) {
-  // Clear the log for a new run.
-  logger.clear();
+  // Reset the logs for a new run.
+  logger.reset();
+  codder.reset();
 
   // Load the value from the form and write them to the url.
   controller.each(function(index, value) {
@@ -503,16 +545,20 @@ var sendRequest = function(controller, url) {
   var xhr = createCORSRequest(httpMethod, serverUrl);
   var msg = 'Sending ' + htmlEscape(httpMethod) + ' request to ' +
       '<code>' + htmlEscape(serverUrl) + '</code><br>';
+  codder.setUrl(serverUrl);
+  codder.setMethod(httpMethod);
 
   if (controller.getValue('client_credentials')) {
     xhr.withCredentials = true;
     msg += ', with credentials';
+    codder.setCredentials();
   }
 
   var headersMsg = '';
   var requestHeaders = parseHeaders(controller.getValue('client_headers'));
   $.each(requestHeaders, function(key, val) {
     xhr.setRequestHeader(key, val);
+    codder.addHeader(key, val);
     if (headersMsg.length == 0) {
       headersMsg = ', with custom headers: ';
     } else {
@@ -598,6 +644,8 @@ $(function() {
   $('#btnSendRequest').click(function() {
     sendRequest(controller, url);
   });
+
+  $('#result_tabs a:first').tab('show');
 
   // Read the values from the url and write it to the UI.
   controller.each(function(index, value) {
