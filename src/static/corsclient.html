@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="testCorsApp">
  <head>
   <title>test-cors.org</title>
   <link href="css/bootstrap-2.3.2.min.css" rel="stylesheet" media="screen">
  </head>
  <body>
 
-  <div class="container">
+  <div class="container" ng-controller="TestCorsController">
 
   <div class="row">
     <div class="span1"></div>
@@ -201,9 +201,17 @@ xhr.send();
 
 <a href="https://github.com/monsur/cors-api"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 
+  <script src="js/angular-1.0.7.min.js"></script>
   <script src="js/jquery-2.0.3.min.js"></script>
   <script src="js/bootstrap-2.3.2.min.js"></script>
-  <script src="js/corsclient.js"></script>
+
+  <script>
+    // TODO: Move this into a separate file.
+
+    testCorsApp.controller('TestCorsController', function($scope) {
+
+    });
+  </script>
 
 <script type="text/javascript">
 
