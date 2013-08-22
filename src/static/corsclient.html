@@ -38,14 +38,16 @@
     <div class="control-group" id="client_credentials_div" title="Help: With credentials?" data-content="Whether the client should include cookies in the request.">
       <label class="control-label" for="client_credentials">With credentials?</label>
       <div class="controls">
-        <input type="checkbox" id="client_credentials" />
+        <input type="checkbox" id="client_credentials"
+          ng-model="client.credentials" />
       </div>
     </div>
 
     <div class="control-group" id="client_method_div" title="Help: Request Headers" data-content="A list of custom request headers to include in the request. One header per line, in the format key: value.">
       <label class="control-label" for="client_headers">Request Headers</label>
       <div class="controls">
-        <textarea id="client_headers" class="span2" rows="4"></textarea>
+        <textarea id="client_headers" class="span2" rows="4"
+          ng-model="client.headers"></textarea>
       </div>
     </div>
 

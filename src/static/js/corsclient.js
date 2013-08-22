@@ -5,7 +5,8 @@ testCorsApp.controller('TestCorsController', function($scope) {
 
   var c = {};
   c.method = 'GET';
-
+  c.credentials = false;
+  c.headers = '';
   $scope.client = c;
 });
 
