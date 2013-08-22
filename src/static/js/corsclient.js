@@ -10,10 +10,26 @@ testCorsApp.controller('TestCorsController', function($scope) {
   $scope.client = c;
 
   var s = {};
+  s.tab = 0;
   s.remote = {};
+  remote.url = '';
   s.local = {};
+  s.local.enable = true;
+  s.local.status = 200;
+  s.local.credentials = false;
+  s.local.methods = '';
+  s.local.headers = '';
+  s.local.exposeHeaders = '';
+  s.local.maxAge = '';
+  s.local.responseHeaders = '';
   $scope.server = s;
+
+  $scope.sendRequest = function() {
+    console.log($scope.client);
+    console.log($scope.server);
+  };
 });
+
 
 
 /**

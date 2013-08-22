@@ -53,7 +53,8 @@
 
     <div class="control-group">
     <div class="controls">
-      <button class="btn btn-large btn-primary" type="button" id="btnSendRequest">Send Request</button>
+      <button class="btn btn-large btn-primary" type="button"
+        id="btnSendRequest" ng-click="sendRequest();">Send Request</button>
     </div></div>
 
     </form>
@@ -62,8 +63,8 @@
     <form class="form-horizontal">
     <legend>Server</legend>
     <ul class="nav nav-tabs" id="server_tabs">
-      <li><a href="#tabremote" data-toggle="tab" id="remote">Remote</a></li>
       <li><a href="#tablocal" data-toggle="tab" id="local">Local</a></li>
+      <li><a href="#tabremote" data-toggle="tab" id="remote">Remote</a></li>
     </ul>
 
     <div class="tab-content">
@@ -72,7 +73,8 @@
         <div class="control-group" id="server_url_div" title="Help: Remote URL" data-content="The URL to test for CORS support.">
           <label class="control-label" for="server_url">Remote URL</label>
           <div class="controls">
-            <input type="text" id="server_url" class="span2" />
+            <input type="text" id="server_url" class="span2"
+              ng-model="server.remote.url" />
           </div>
         </div>
       </div>
@@ -82,56 +84,64 @@
         <div class="control-group" id="server_enable_div" title="Help: Enable CORS" data-content="Whether or not the server should allow CORS requests.">
           <label class="control-label" for="server_enable">Enable CORS</label>
           <div class="controls">
-            <input type="checkbox" id="server_enable" checked />
+            <input type="checkbox" id="server_enable"
+              ng-model="server.local.enable" />
           </div>
         </div>
 
         <div class="control-group" id="server_status_div" title="Help: HTTP Status" data-content="The HTTP Status code the server should respond with. Default: 200.">
           <label class="control-label" for="server_status">HTTP Status</label>
           <div class="controls">
-<input type="text" id="server_status" value="200" class="span1" />
+            <input type="text" id="server_status" class="span1"
+              ng-model="server.local.status" />
           </div>
         </div>
 
         <div class="control-group" id="server_credentials_div" title="Help: Allow Credentials" data-content="Whether the server should allow cookies on the request.">
           <label class="control-label" for="server_credentials">Allow Credentials</label>
           <div class="controls">
-            <input type="checkbox" id="server_credentials" />
+            <input type="checkbox" id="server_credentials"
+              ng-model="server.local.credentials" />
           </div>
         </div>
 
         <div class="control-group" id="server_methods_div" title="Help: Allow Methods" data-content="Comma-delimited list of HTTP methods the server should allow.">
           <label class="control-label" for="server_methods">Allow Methods</label>
           <div class="controls">
-            <input type="text" id="server_methods" class="span2" />
+            <input type="text" id="server_methods" class="span2"
+              ng-model="server.local.methods" />
           </div>
         </div>
 
         <div class="control-group" id="server_headers_div" title="Help: Allow Headers" data-content="Comma-delimited list of HTTP headers the server should allow.">
           <label class="control-label" for="server_headers">Allow Headers</label>
           <div class="controls">
-            <input type="text" id="server_headers" class="span2" />
+            <input type="text" id="server_headers" class="span2"
+              ng-model="server.local.headers" />
           </div>
         </div>
 
         <div class="control-group" id="server_expose_headers_div" title="Help: Expose Headers" data-content="Comma-delimited list of HTTP response headers that the client should be able to view.">
           <label class="control-label" for="server_expose_headers">Expose Headers</label>
           <div class="controls">
-            <input type="text" id="server_expose_headers" class="span2" />
+            <input type="text" id="server_expose_headers" class="span2"
+              ng-model="server.local.exposeHeaders" />
           </div>
         </div>
 
         <div class="control-group" id="server_max_age_div" title="Help: Max Age" data-content="The time, in seconds, that the preflight response should be cached for.">
           <label class="control-label" for="server_max_age">Max Age</label>
           <div class="controls">
-            <input type="text" id="server_max_age" class="span2" />
+            <input type="text" id="server_max_age" class="span2"
+              ng-model="server.local.maxAge" />
           </div>
         </div>
 
         <div class="control-group" id="server_response_headers_div" title="Help: Response Headers" data-content="Custom headers to include in the server response.">
           <label class="control-label" for="server_response_headers">Response Headers</label>
           <div class="controls">
-            <textarea id="server_response_headers" class="span2" rows="3"></textarea>
+            <textarea id="server_response_headers" class="span2" rows="3"
+              ng-model="server.local.responseHeaders"></textarea>
           </div>
         </div>
 
