@@ -8,6 +8,11 @@ testCorsApp.controller('TestCorsController', function($scope) {
   c.credentials = false;
   c.headers = '';
   $scope.client = c;
+
+  var s = {};
+  s.remote = {};
+  s.local = {};
+  $scope.server = s;
 });
 
 
