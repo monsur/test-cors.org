@@ -1,4 +1,14 @@
-(function(window, undefined) {
+var testCorsApp = angular.module('testCorsApp', []);
+
+testCorsApp.controller('TestCorsController', function($scope) {
+  $scope.HTTP_METHODS = ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+
+  var c = {};
+  c.method = 'GET';
+
+  $scope.client = c;
+});
+
 
 /**
  * The url to send the request to
@@ -608,6 +618,7 @@ var sendRequest = function(controller, url) {
 };
 
 
+/*
 $(function() {
 
   // Set up the help menus.
@@ -653,5 +664,4 @@ $(function() {
     value.toUi();
   });
 });
-
-})(window);
+*/

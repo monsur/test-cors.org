@@ -28,13 +28,9 @@
     <div class="control-group" id="client_method_div" title="Help: HTTP Method" data-content="Which HTTP method the client should use when making the request.">
       <label class="control-label" for="client_method">HTTP Method</label>
       <div class="controls">
-        <select id="client_method" class="span2">
-          <option value="HEAD">HEAD</option>
-          <option value="GET" selected>GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-          <option value="OPTIONS">OPTIONS</option>
+        <select id="client_method" class="span2"
+          ng-model="client.method"
+          ng-options="m for m in HTTP_METHODS">
         </select>
       </div>
     </div>
@@ -204,14 +200,7 @@ xhr.send();
   <script src="js/angular-1.0.7.min.js"></script>
   <script src="js/jquery-2.0.3.min.js"></script>
   <script src="js/bootstrap-2.3.2.min.js"></script>
-
-  <script>
-    // TODO: Move this into a separate file.
-
-    testCorsApp.controller('TestCorsController', function($scope) {
-
-    });
-  </script>
+  <script src="js/corsclient.js"></script>
 
 <script type="text/javascript">
 
