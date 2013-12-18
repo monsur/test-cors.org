@@ -71,10 +71,12 @@ Logger.prototype.logXhr = function(xhr) {
     this.log('XHR status text: ' + htmlEscape(xhr.statusText));
   }
 
-  var headers = xhr.getAllResponseHeaders();
-  if (headers) {
-    this.log('XHR exposed response headers: ' +
-        '<pre class="headers">' + htmlEscape(headers) + '</pre>');
+  if ('getAllResponseHeaders' in  xhr) {
+    var headers = xhr.getAllResponseHeaders();
+    if (headers) {
+      this.log('XHR exposed response headers: ' +
+          '<pre class="headers">' + htmlEscape(headers) + '</pre>');
+    }
   }
 
   var text = xhr.responseText;
