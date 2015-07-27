@@ -606,7 +606,8 @@ var sendRequest = function(controller, url) {
 
   logger.log(msg);
 
-  xhr.send();
+  xhr.send(controller.getValue('client_postdata'));
+  
 };
 
 
