@@ -606,7 +606,13 @@ var sendRequest = function(controller, url) {
 
   logger.log(msg);
 
-  xhr.send();
+  var postData = controller.getValue('client_postdata');
+  if (postData !== '') {
+    xhr.send(postData);
+  } else {
+    xhr.send();
+  }
+
 };
 
 
