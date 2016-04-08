@@ -1,5 +1,6 @@
 web.client.live
 web.client.local
 web.server
+*.pyc
 *.swp
 *~
