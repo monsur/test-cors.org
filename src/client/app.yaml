@@ -1,5 +1,4 @@
-application: $APPLICATION
-version: client
+application: client-test-cors-org
 runtime: python27
 api_version: 1
 threadsafe: true
