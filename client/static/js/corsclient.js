@@ -4,7 +4,7 @@
  * The url to send the request to
  * (if using "local" mode).
  */
-var SERVER_URL = 'http://server-test-cors-org.appspot.com/server';
+var SERVER_URL = 'http://server.test-cors.org/server';
 
 /**
  * The prefix to identify server fields.
