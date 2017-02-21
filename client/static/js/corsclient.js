@@ -541,6 +541,9 @@ var sendRequest = function(controller, url) {
   // Link to this test.
   logger.log('<a href="#" onclick="javascript:prompt(\'Here\\\'s a link to this test\', \'' + htmlEscape(window.location.href) + '\');return false;">Link to this test</a><br>');
 
+  // point out what users should expect to encounter when testing a server that supports CORS
+  logger.log('<p>Note: CORS enabled remote servers return <span class="inline-code">XHR status: 200</span></p>');
+
   // Create the XHR object and make the request.
   var httpMethod = controller.getValue('client_method');
   var serverUrl = getServerUrl(controller);

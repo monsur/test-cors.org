@@ -42,3 +42,11 @@ td {
 .headers {
   margin: 0 0 0 0;
 }
+
+.inline-code {
+  padding: 2px 4px;
+  color: black;
+  white-space: nowrap;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
