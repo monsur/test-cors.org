@@ -621,9 +621,9 @@ $(function() {
   // Set up the help menus.
   var help_divs = $('.control-group').filter('div[id]').each(function() {
     var id = $(this).attr('id');
-    var placement = 'left';
+    var placement = 'top';
     if (id.indexOf('server_') == 0) {
-      placement = 'right';
+      placement = 'top';
     }
     $(this).popover({
       placement: placement,
