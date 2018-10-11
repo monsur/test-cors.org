@@ -87,7 +87,11 @@ class CorsServer(webapp2.RequestHandler):
     return 'origin' in self.request.headers
 
   def __addCorsHeaders(self, config):
-    self.response.headers['Access-Control-Allow-Origin'] = self.request.headers['origin']
+    if 'origin' in config:
+      origin = str(config['origin'])
+    else:
+      origin = self.request.headers['origin']
+    self.response.headers['Access-Control-Allow-Origin'] = origin
     self.response.headers['Set-Cookie'] = 'cookie-from-server=noop';
     if 'credentials' in config and config['credentials'] == True:
       self.response.headers['Access-Control-Allow-Credentials'] = 'true'
@@ -163,6 +167,8 @@ class CorsServer(webapp2.RequestHandler):
       config['credentials'] = True
     config['httpMethod'] = httpMethod
     config['methods'] = self.request.get('methods')
+    if self.request.get('origin'): # falsy if string is empty
+      config['origin'] = self.request.get('origin')
     config['headers'] = self.request.get('headers')
     config['exposeHeaders'] = self.request.get('expose_headers')
     config['id'] = self.request.get('id')

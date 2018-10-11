@@ -1,9 +1,0 @@
-The code behind http://test-cors.org
-
-The code is divided into two parts:
-
-1. The client code in src/client that makes the CORS request.
-1. The server code in src/server that receives the CORS request.
-
-The client and server code need to live on different origins (in order to be a
-true cross-origin request). The code here is deployed to Google's App Engine.
