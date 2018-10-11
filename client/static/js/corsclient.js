@@ -4,7 +4,7 @@
  * The url to send the request to
  * (if using "local" mode).
  */
-var SERVER_URL = 'http://server.test-cors.org/server';
+var DEFAULT_SERVER_URL = 'http://server.test-cors.org/server';
 
 /**
  * The prefix to identify server fields.
@@ -454,6 +454,11 @@ var getServerUrl = function(controller) {
     // If running in "remote" mode, use the url supplied by the user.
     return controller.getValue('server_url');
   }
+  var serverUrl = DEFAULT_SERVER_URL;
+  if (controller.getValue('server_url')) {
+    // If 'Local' is selected... still allow the user to supply a non default url.
+    serverUrl = controller.getValue('server_url');
+  }
 
   var queryObj = {};
 
@@ -470,7 +475,7 @@ var getServerUrl = function(controller) {
     }
   });
 
-  return SERVER_URL + '?' + Query.serialize(queryObj);
+  return serverUrl + '?' + Query.serialize(queryObj);
 };
 
 
