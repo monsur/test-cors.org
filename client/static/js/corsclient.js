@@ -455,9 +455,9 @@ var getServerUrl = function(controller) {
     return controller.getValue('server_url');
   }
   var serverUrl = DEFAULT_SERVER_URL;
-  if (controller.getValue('server_url')) {
+  if (controller.getValue('server_local_url')) {
     // If 'Local' is selected... still allow the user to supply a non default url.
-    serverUrl = controller.getValue('server_url');
+    serverUrl = controller.getValue('server_local_url');
   }
 
   var queryObj = {};
@@ -467,7 +467,7 @@ var getServerUrl = function(controller) {
   controller.each(function(index, value) {
     var id = value.getId();
     if (id.indexOf(SERVER_PREFIX_) === 0) {
-      if (id === 'server_tabs' || id === 'server_url') {
+      if (id === 'server_tabs' || id === 'server_url' || id === 'server_local_url') {
         // Skip any server fields that aren't used by the local server.
         return;
       }
